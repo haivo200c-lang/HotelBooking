@@ -118,3 +118,4 @@ Hệ thống đã tự động khởi tạo dữ liệu mẫu với các tài kh
 
 > [!NOTE]
 > Dự án được tối ưu 100% để chạy mượt mà trên máy tính của bạn với mã nguồn rõ ràng, kiến trúc phân tầng chuẩn MVC và dễ dàng giải thích trong phần hỏi đáp với hội đồng chấm thi!
+LAB 03 - Conflict A
