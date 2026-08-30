@@ -1,0 +1,214 @@
+@model HotelBooking.Models.ViewModels.PaymentDemoViewModel
+@{
+    ViewData["Title"] = "Cổng Thanh Toán Mô Phỏng - " + Model.BookingCode;
+}
+
+<div class="container py-4 my-2">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb small">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-decoration-none">Trang chủ</a></li>
+            <li class="breadcrumb-item">Đặt phòng</li>
+            <li class="breadcrumb-item active" aria-current="page">Thanh toán mô phỏng</li>
+        </ol>
+    </nav>
+
+    <!-- Step Progress Bar -->
+    <div class="card border-0 shadow-sm rounded-4 p-3 mb-4 bg-white">
+        <div class="row text-center">
+            <div class="col-4">
+                <span class="badge bg-success rounded-circle p-2 px-3 fw-bold me-1"><i class="bi bi-check"></i></span>
+                <span class="fw-semibold text-muted small">Thông Tin Đặt Phòng</span>
+            </div>
+            <div class="col-4">
+                <span class="badge bg-primary rounded-circle p-2 px-3 fw-bold me-1">2</span>
+                <span class="fw-bold text-primary small">Thanh Toán Demo</span>
+            </div>
+            <div class="col-4">
+                <span class="badge bg-secondary rounded-circle p-2 px-3 fw-bold me-1">3</span>
+                <span class="fw-semibold text-muted small">Xác Nhận Thành Công</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden mb-4">
+                <!-- Payment Header -->
+                <div class="card-header bg-gradient text-white p-4 text-center" style="background: linear-gradient(135deg, #0d6efd 0%, #0f2942 100%);">
+                    <div class="d-inline-flex align-items-center justify-content-center bg-white text-primary rounded-circle p-3 mb-2 shadow-sm" style="width: 60px; height: 60px;">
+                        <i class="bi bi-qr-code-scan fs-2"></i>
+                    </div>
+                    <h4 class="fw-bold mb-1">Cổng Thanh Toán Trực Tuyến Mô Phỏng</h4>
+                    <p class="text-white-50 small mb-0">Mã đơn: <strong class="text-warning">@Model.BookingCode</strong> • Tổng tiền: <strong class="text-white fs-5">@Model.TotalAmount.ToString("N0") đ</strong></p>
+                </div>
+
+                <div class="card-body p-4 p-md-5">
+                    <!-- Method Selector Tabs -->
+                    <ul class="nav nav-pills nav-fill mb-4 bg-light p-2 rounded-4" id="paymentTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link @(Model.PaymentMethod == "VNPay" ? "active" : "") rounded-3 fw-bold py-2" id="vnpay-tab" data-bs-toggle="pill" data-bs-target="#vnpay-pane" type="button" role="tab">
+                                <i class="bi bi-qr-code text-danger me-1"></i> VNPay QR
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link @(Model.PaymentMethod == "MoMo" ? "active" : "") rounded-3 fw-bold py-2" id="momo-tab" data-bs-toggle="pill" data-bs-target="#momo-pane" type="button" role="tab">
+                                <i class="bi bi-wallet2 text-primary me-1"></i> Ví MoMo
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link @(Model.PaymentMethod == "BankTransfer" ? "active" : "") rounded-3 fw-bold py-2" id="bank-tab" data-bs-toggle="pill" data-bs-target="#bank-pane" type="button" role="tab">
+                                <i class="bi bi-bank text-success me-1"></i> Chuyển Khoản
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link @(Model.PaymentMethod == "Cash" ? "active" : "") rounded-3 fw-bold py-2" id="cash-tab" data-bs-toggle="pill" data-bs-target="#cash-pane" type="button" role="tab">
+                                <i class="bi bi-cash-stack text-secondary me-1"></i> Tiền Mặt
+                            </button>
+                        </li>
+                    </ul>
+
+                    <!-- Tab Contents -->
+                    <div class="tab-content" id="paymentTabsContent">
+                        <!-- VNPay Tab -->
+                        <div class="tab-pane fade @(Model.PaymentMethod == "VNPay" ? "show active" : "")" id="vnpay-pane" role="tabpanel">
+                            <div class="row align-items-center g-4">
+                                <div class="col-md-5 text-center">
+                                    <div class="p-3 bg-white border border-2 border-danger rounded-4 shadow-sm d-inline-block">
+                                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=VNPAY_DEMO_@Model.BookingCode" class="img-fluid rounded-3" alt="VNPay QR Demo" style="width: 180px; height: 180px;" />
+                                        <small class="d-block text-danger fw-bold mt-2"><i class="bi bi-camera me-1"></i> Quét mã qua VNPAY-QR</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-7">
+                                    <h5 class="fw-bold text-dark mb-2">Thanh toán qua Cổng VNPAY</h5>
+                                    <p class="text-muted small mb-3">Mở App ngân hàng bất kỳ (Vietcombank, MB, BIDV, Techcombank...) hoặc ví VNPAY và quét mã bên cạnh để thanh toán tức thì.</p>
+                                    
+                                    <div class="bg-light p-3 rounded-3 mb-3 small">
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span class="text-muted">Đơn vị nhận:</span>
+                                            <strong class="text-dark">LUXURY HOTEL BOOKING</strong>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span class="text-muted">Số tiền:</span>
+                                            <strong class="text-danger">@Model.TotalAmount.ToString("N0") VNĐ</strong>
+                                        </div>
+                                        <div class="d-flex justify-content-between">
+                                            <span class="text-muted">Nội dung:</span>
+                                            <strong class="text-primary font-monospace">@Model.BookingCode</strong>
+                                        </div>
+                                    </div>
+
+                                    <form asp-action="ProcessPayment" method="post">
+                                        <input type="hidden" name="bookingId" value="@Model.BookingId" />
+                                        <input type="hidden" name="paymentMethod" value="VNPay" />
+                                        <button type="submit" class="btn btn-danger btn-lg w-100 rounded-pill fw-bold shadow-sm py-2">
+                                            <i class="bi bi-check2-circle me-1"></i> Xác Nhận Đã Quét QR & Thanh Toán (Demo)
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- MoMo Tab -->
+                        <div class="tab-pane fade @(Model.PaymentMethod == "MoMo" ? "show active" : "")" id="momo-pane" role="tabpanel">
+                            <div class="row align-items-center g-4">
+                                <div class="col-md-5 text-center">
+                                    <div class="p-3 bg-white border border-2 rounded-4 shadow-sm d-inline-block" style="border-color: #a50064 !important;">
+                                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=MOMO_DEMO_@Model.BookingCode" class="img-fluid rounded-3" alt="MoMo QR Demo" style="width: 180px; height: 180px;" />
+                                        <small class="d-block fw-bold mt-2" style="color: #a50064;"><i class="bi bi-phone me-1"></i> Quét mã qua App MoMo</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-7">
+                                    <h5 class="fw-bold text-dark mb-2" style="color: #a50064 !important;">Thanh toán bằng Ví MoMo</h5>
+                                    <p class="text-muted small mb-3">Sử dụng ứng dụng MoMo trên điện thoại để quét mã QR và xác nhận giao dịch không cần tiền mặt.</p>
+
+                                    <div class="bg-light p-3 rounded-3 mb-3 small">
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span class="text-muted">Tài khoản ví:</span>
+                                            <strong class="text-dark">0901234567 (Hotel Booking Corp)</strong>
+                                        </div>
+                                        <div class="d-flex justify-content-between">
+                                            <span class="text-muted">Số tiền:</span>
+                                            <strong class="text-danger">@Model.TotalAmount.ToString("N0") VNĐ</strong>
+                                        </div>
+                                    </div>
+
+                                    <form asp-action="ProcessPayment" method="post">
+                                        <input type="hidden" name="bookingId" value="@Model.BookingId" />
+                                        <input type="hidden" name="paymentMethod" value="MoMo" />
+                                        <button type="submit" class="btn btn-lg w-100 rounded-pill fw-bold text-white shadow-sm py-2" style="background-color: #a50064;">
+                                            <i class="bi bi-check2-circle me-1"></i> Xác Nhận Thanh Toán MoMo (Demo)
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bank Transfer Tab -->
+                        <div class="tab-pane fade @(Model.PaymentMethod == "BankTransfer" ? "show active" : "")" id="bank-pane" role="tabpanel">
+                            <div class="row align-items-center g-4">
+                                <div class="col-md-5 text-center">
+                                    <div class="p-3 bg-white border border-2 border-success rounded-4 shadow-sm d-inline-block">
+                                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=VIETQR_DEMO_@Model.BookingCode" class="img-fluid rounded-3" alt="VietQR Demo" style="width: 180px; height: 180px;" />
+                                        <small class="d-block text-success fw-bold mt-2"><i class="bi bi-qr-code me-1"></i> VietQR Chuyển Khoản 24/7</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-7">
+                                    <h5 class="fw-bold text-dark mb-2">Chuyển Khoản Ngân Hàng 24/7</h5>
+                                    
+                                    <div class="bg-light p-3 rounded-3 mb-3 small">
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span class="text-muted">Ngân hàng:</span>
+                                            <strong class="text-dark">Vietcombank (CN TP.HCM)</strong>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span class="text-muted">Số tài khoản:</span>
+                                            <strong class="text-primary font-monospace fs-6">9988 7766 5544</strong>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-1">
+                                            <span class="text-muted">Chủ tài khoản:</span>
+                                            <strong class="text-dark">CONG TY TNHH HOTEL BOOKING</strong>
+                                        </div>
+                                        <div class="d-flex justify-content-between">
+                                            <span class="text-muted">Cú pháp:</span>
+                                            <strong class="text-danger font-monospace">@Model.BookingCode</strong>
+                                        </div>
+                                    </div>
+
+                                    <form asp-action="ProcessPayment" method="post">
+                                        <input type="hidden" name="bookingId" value="@Model.BookingId" />
+                                        <input type="hidden" name="paymentMethod" value="BankTransfer" />
+                                        <button type="submit" class="btn btn-success btn-lg w-100 rounded-pill fw-bold shadow-sm py-2">
+                                            <i class="bi bi-check2-circle me-1"></i> Xác Nhận Tôi Đã Chuyển Khoản (Demo)
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Cash Tab -->
+                        <div class="tab-pane fade @(Model.PaymentMethod == "Cash" ? "show active" : "")" id="cash-pane" role="tabpanel">
+                            <div class="text-center py-4">
+                                <div class="bg-secondary bg-opacity-10 text-secondary rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                                    <i class="bi bi-cash-stack fs-1"></i>
+                                </div>
+                                <h4 class="fw-bold text-dark mb-2">Thanh Toán Trực Tiếp Tại Quầy Lễ Tân</h4>
+                                <p class="text-muted small mb-4 mx-auto" style="max-width: 500px;">
+                                    Đơn đặt phòng của bạn sẽ được giữ chỗ. Bạn có thể thanh toán bằng tiền mặt hoặc thẻ tín dụng trực tiếp khi đến làm thủ tục nhận phòng tại khách sạn.
+                                </p>
+
+                                <form asp-action="ProcessPayment" method="post">
+                                    <input type="hidden" name="bookingId" value="@Model.BookingId" />
+                                    <input type="hidden" name="paymentMethod" value="Cash" />
+                                    <button type="submit" class="btn btn-primary btn-lg rounded-pill fw-bold px-5 shadow-sm">
+                                        <i class="bi bi-check-circle-fill me-2"></i> Hoàn Tất Đặt Phòng & Nhận Mã Đơn
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

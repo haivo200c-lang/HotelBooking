@@ -1,0 +1,110 @@
+@model HotelBooking.Models.Entities.Hotel
+@{
+    ViewData["Title"] = "Chi Tiết - " + Model.Name;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="fw-bold text-dark mb-1">Chi Tiết Khách Sạn</h4>
+        <p class="text-muted small mb-0">Xem thông tin quản lý tổng quan cho <strong>@Model.Name</strong></p>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary rounded-pill px-4 fw-semibold">
+            <i class="bi bi-pencil me-1"></i> Chỉnh Sửa
+        </a>
+        <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4 fw-semibold">
+            <i class="bi bi-arrow-left me-1"></i> Quay Lại
+        </a>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white text-center p-4">
+            <img src="@Model.MainImageUrl" class="rounded-4 mb-3 w-100" style="height: 200px; object-fit: cover;" alt="@Model.Name" />
+            <h5 class="fw-bold text-dark mb-1">@Model.Name</h5>
+            <p class="text-muted small mb-2"><i class="bi bi-geo-alt me-1 text-danger"></i> @Model.Address, @Model.City</p>
+            <div class="mb-3">
+                <span class="text-warning">
+                    @for (int i = 0; i < Model.StarRating; i++)
+                    {
+                        <i class="bi bi-star-fill"></i>
+                    }
+                </span>
+            </div>
+            <div class="d-flex justify-content-around p-3 bg-light rounded-3 text-center">
+                <div>
+                    <span class="small text-muted d-block">Số Hạng Phòng</span>
+                    <strong class="text-primary fs-5">@Model.Rooms.Count</strong>
+                </div>
+                <div class="border-start"></div>
+                <div>
+                    <span class="small text-muted d-block">Đánh Giá</span>
+                    <strong class="text-warning fs-5">@Model.AverageRating ⭐</strong>
+                </div>
+                <div class="border-start"></div>
+                <div>
+                    <span class="small text-muted d-block">Tổng Booking</span>
+                    <strong class="text-success fs-5">@Model.Bookings.Count</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm rounded-4 p-4 bg-white mb-4">
+            <h5 class="fw-bold text-dark mb-3">Mô Tả & Thông Tin Liên Hệ</h5>
+            <p class="text-muted leading-relaxed mb-4">@Model.Description</p>
+
+            <div class="row g-3 small">
+                <div class="col-md-6">
+                    <span class="text-muted d-block">Số điện thoại:</span>
+                    <strong class="text-dark">@(Model.Phone ?? "Chưa cập nhật")</strong>
+                </div>
+                <div class="col-md-6">
+                    <span class="text-muted d-block">Email:</span>
+                    <strong class="text-dark">@(Model.Email ?? "Chưa cập nhật")</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rooms list in this hotel -->
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white">
+            <div class="card-header bg-white border-0 pt-4 px-4 pb-2 d-flex justify-content-between align-items-center">
+                <h5 class="fw-bold text-dark mb-0"><i class="bi bi-door-open text-primary me-2"></i> Danh Sách Hạng Phòng (@Model.Rooms.Count)</h5>
+                <a asp-area="Admin" asp-controller="Rooms" asp-action="Create" asp-route-hotelId="@Model.Id" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                    <i class="bi bi-plus-lg me-1"></i> Thêm Phòng
+                </a>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr class="small text-muted text-uppercase">
+                            <th class="ps-4">Tên Hạng Phòng</th>
+                            <th>Sức Chứa</th>
+                            <th>Diện Tích</th>
+                            <th>Giá / Đêm</th>
+                            <th>Còn Trống</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var room in Model.Rooms)
+                        {
+                            <tr>
+                                <td class="ps-4">
+                                    <strong class="text-dark d-block">@room.Name</strong>
+                                    <small class="text-muted">@room.RoomType?.Name</small>
+                                </td>
+                                <td>@room.Capacity khách</td>
+                                <td>@room.AreaM2 m²</td>
+                                <td><strong class="text-primary">@room.PricePerNight.ToString("N0") đ</strong></td>
+                                <td><span class="badge bg-success bg-opacity-10 text-success fw-bold">@room.AvailableQuantity / @room.TotalQuantity</span></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

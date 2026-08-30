@@ -1,0 +1,302 @@
+@model HotelBooking.Models.ViewModels.HomeViewModel
+@{
+    ViewData["Title"] = "Trang Chủ - Đặt Phòng Khách Sạn Cao Cấp";
+}
+
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container text-center">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <span class="badge bg-warning text-dark px-3 py-2 rounded-pill fw-bold mb-3 shadow-sm">
+                    <i class="bi bi-stars me-1"></i> Trải Nghiệm Nghỉ Dưỡng Thượng Lưu
+                </span>
+                <h1 class="display-4 fw-extrabold text-white mb-3 tracking-tight">
+                    Tìm Kiếm & Đặt Phòng Khách Sạn Hoàn Hảo Cho Kỳ Nghỉ Của Bạn
+                </h1>
+                <p class="lead text-white-50 mb-4 px-lg-5">
+                    Hơn <strong>@Model.TotalHotelsCount khách sạn & resort 5 sao</strong> cao cấp hàng đầu Việt Nam với giá tốt nhất và dịch vụ chu đáo 24/7.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Floating Search Box Widget -->
+<div class="container hero-search-wrapper mb-5">
+    <div class="search-box-card">
+        <form asp-controller="Hotel" asp-action="Index" method="get">
+            <div class="row g-3 align-items-center">
+                <!-- Destination -->
+                <div class="col-lg-4 col-md-6">
+                    <label class="form-label fw-bold small text-muted mb-1"><i class="bi bi-geo-alt-fill text-danger me-1"></i> ĐIỂM ĐẾN / KHÁCH SẠN</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0 rounded-start-3"><i class="bi bi-search text-muted"></i></span>
+                        <input type="text" name="Destination" class="form-control bg-light border-start-0 rounded-end-3 py-2 fw-semibold" placeholder="Bạn muốn đến đâu? (Đà Nẵng, Phú Quốc...)" />
+                    </div>
+                </div>
+
+                <!-- Check In Date -->
+                <div class="col-lg-2 col-md-3 col-6">
+                    <label class="form-label fw-bold small text-muted mb-1"><i class="bi bi-calendar-check text-primary me-1"></i> NHẬN PHÒNG</label>
+                    <input type="date" name="CheckInDate" class="form-control bg-light py-2 rounded-3 fw-semibold" value="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")" min="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                </div>
+
+                <!-- Check Out Date -->
+                <div class="col-lg-2 col-md-3 col-6">
+                    <label class="form-label fw-bold small text-muted mb-1"><i class="bi bi-calendar-x text-primary me-1"></i> TRẢ PHÒNG</label>
+                    <input type="date" name="CheckOutDate" class="form-control bg-light py-2 rounded-3 fw-semibold" value="@DateTime.Today.AddDays(3).ToString("yyyy-MM-dd")" min="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")" />
+                </div>
+
+                <!-- Guests & Rooms -->
+                <div class="col-lg-2 col-md-6">
+                    <label class="form-label fw-bold small text-muted mb-1"><i class="bi bi-people-fill text-success me-1"></i> SỐ KHÁCH</label>
+                    <select name="Guests" class="form-select bg-light py-2 rounded-3 fw-semibold">
+                        <option value="1">1 Khách (Phòng đơn)</option>
+                        <option value="2" selected>2 Khách (1 Phòng đôi)</option>
+                        <option value="3">3 Khách (1 Phòng)</option>
+                        <option value="4">4 Khách (Gia đình)</option>
+                        <option value="6">6 Khách (Nhóm/Villa)</option>
+                    </select>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="col-lg-2 col-md-6 d-grid">
+                    <label class="form-label d-none d-lg-block mb-1">&nbsp;</label>
+                    <button type="submit" class="btn btn-primary btn-lg rounded-3 fw-bold py-2 shadow-sm d-flex align-items-center justify-content-center gap-2" style="background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%); border: none;">
+                        <i class="bi bi-search"></i> Tìm Kiếm
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Popular Destinations Section -->
+<section class="container py-4 my-2">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end mb-4">
+        <div>
+            <span class="text-primary fw-bold text-uppercase small tracking-wider"><i class="bi bi-compass me-1"></i> Điểm Đến Hàng Đầu</span>
+            <h2 class="fw-extrabold text-dark tracking-tight mb-1">Khám Phá Các Thành Phố Du Lịch Hot</h2>
+            <p class="text-muted mb-0">Những thiên đường nghỉ dưỡng được yêu thích nhất trong năm</p>
+        </div>
+        <a asp-controller="Hotel" asp-action="Index" class="btn btn-outline-primary rounded-pill px-4 fw-semibold mt-3 mt-md-0">
+            Xem tất cả điểm đến <i class="bi bi-arrow-right ms-1"></i>
+        </a>
+    </div>
+
+    <div class="row g-4">
+        @foreach (var dest in Model.PopularDestinations)
+        {
+            <div class="col-lg-4 col-md-6">
+                <a asp-controller="Hotel" asp-action="Index" asp-route-City="@dest.CityName" class="text-decoration-none">
+                    <div class="destination-card">
+                        <img src="@dest.ImageUrl" alt="@dest.CityName" loading="lazy" />
+                        <div class="destination-overlay">
+                            <span class="badge bg-warning text-dark align-self-start mb-2 fw-bold px-3 py-1 rounded-pill">
+                                @dest.HotelCount Khách sạn & Resort
+                            </span>
+                            <h4 class="fw-bold mb-0 text-white">@dest.CityName</h4>
+                            <small class="text-white-50">Giá chỉ từ <strong class="text-warning">@dest.StartingPrice.ToString("N0") đ</strong> / đêm</small>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        }
+    </div>
+</section>
+
+<!-- Featured Luxury Hotels Section -->
+<section class="container py-5 my-2">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end mb-4">
+        <div>
+            <span class="text-warning fw-bold text-uppercase small tracking-wider"><i class="bi bi-star-fill me-1"></i> Đẳng Cấp 5 Sao</span>
+            <h2 class="fw-extrabold text-dark tracking-tight mb-1">Khách Sạn & Resort Nổi Bật</h2>
+            <p class="text-muted mb-0">Tuyển chọn các khách sạn có dịch vụ hàng đầu và đánh giá xuất sắc</p>
+        </div>
+        <a asp-controller="Hotel" asp-action="Index" class="btn btn-primary rounded-pill px-4 fw-semibold mt-3 mt-md-0">
+            Xem toàn bộ khách sạn <i class="bi bi-chevron-right ms-1"></i>
+        </a>
+    </div>
+
+    <div class="row g-4">
+        @foreach (var hotel in Model.FeaturedHotels)
+        {
+            <div class="col-lg-4 col-md-6">
+                <div class="hotel-card d-flex flex-column">
+                    <div class="hotel-card-img-wrapper">
+                        <img src="@hotel.MainImageUrl" class="hotel-card-img" alt="@hotel.Name" loading="lazy" />
+                        @if (hotel.IsFeatured)
+                        {
+                            <span class="badge-featured"><i class="bi bi-stars me-1"></i> Nổi Bật</span>
+                        }
+                    </div>
+
+                    <div class="p-4 d-flex flex-column flex-grow-1">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div class="star-rating">
+                                @for (int i = 0; i < hotel.StarRating; i++)
+                                {
+                                    <i class="bi bi-star-fill"></i>
+                                }
+                            </div>
+                            <div class="d-flex align-items-center gap-1">
+                                <span class="badge-rating">@hotel.AverageRating</span>
+                            </div>
+                        </div>
+
+                        <h5 class="fw-bold text-dark mb-1 text-truncate" title="@hotel.Name">
+                            <a asp-controller="Hotel" asp-action="Detail" asp-route-id="@hotel.Id" class="text-dark text-decoration-none">
+                                @hotel.Name
+                            </a>
+                        </h5>
+
+                        <p class="text-muted small mb-3">
+                            <i class="bi bi-geo-alt-fill text-danger me-1"></i> @hotel.City, @hotel.Country
+                        </p>
+
+                        <!-- Facilities preview -->
+                        <div class="d-flex flex-wrap gap-1 mb-4">
+                            @foreach (var ha in hotel.HotelAmenities.Take(3))
+                            {
+                                <span class="facility-pill">
+                                    <i class="bi @ha.Amenity?.Icon text-primary"></i> @ha.Amenity?.Name
+                                </span>
+                            }
+                        </div>
+
+                        <div class="mt-auto pt-3 border-top d-flex justify-content-between align-items-center">
+                            <div>
+                                <small class="text-muted d-block">Giá mỗi đêm từ</small>
+                                <span class="fs-5 fw-extrabold text-primary">@hotel.MinPrice.ToString("N0") đ</span>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <a asp-controller="Hotel" asp-action="Detail" asp-route-id="@hotel.Id" class="btn btn-outline-primary btn-sm rounded-pill px-3 fw-bold">
+                                    Xem Chi Tiết
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</section>
+
+<!-- Promotional Banner & Deals -->
+<section class="container py-4 my-2">
+    <div class="card border-0 rounded-4 overflow-hidden shadow-sm" style="background: linear-gradient(135deg, #0f2942 0%, #1e3c72 100%); color: #ffffff;">
+        <div class="card-body p-lg-5 p-4">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <span class="badge bg-danger px-3 py-2 rounded-pill fw-bold mb-2">ƯU ĐÃI ĐẶC QUYỀN MÙA HÈ 2026</span>
+                    <h2 class="fw-bold mb-2 text-white">Giảm Ngay 15% Cho Đơn Đặt Phòng Trực Tuyến Đầu Tiên</h2>
+                    <p class="text-white-50 mb-4 pe-lg-5">Nhập mã ưu đãi <strong>VIPSUMMER2026</strong> khi đặt phòng để nhận ngay chiết khấu trực tiếp và gói buffet sáng miễn phí.</p>
+                    <a asp-controller="Hotel" asp-action="Index" class="btn btn-warning rounded-pill px-4 py-2 fw-bold text-dark shadow-sm">
+                        <i class="bi bi-gift-fill me-2"></i> Khám Phá Ưu Đãi Ngay
+                    </a>
+                </div>
+                <div class="col-lg-4 text-center mt-4 mt-lg-0">
+                    <div class="bg-white bg-opacity-10 p-4 rounded-4 border border-white border-opacity-25">
+                        <div class="display-3 text-warning fw-extrabold mb-0">15%</div>
+                        <span class="text-uppercase fw-bold letter-spacing-1">Giảm Giá Toàn Hệ Thống</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Why Choose Us -->
+<section class="bg-white py-5 my-4 border-top border-bottom">
+    <div class="container py-3">
+        <div class="text-center mb-5">
+            <span class="text-primary fw-bold text-uppercase small tracking-wider"><i class="bi bi-shield-check me-1"></i> Giá Trị Vượt Trội</span>
+            <h2 class="fw-extrabold text-dark tracking-tight">Tại Sao Hàng Triệu Khách Hàng Chọn Chúng Tôi?</h2>
+            <p class="text-muted">Chúng tôi cam kết mang lại kỳ nghỉ trọn vẹn và an tâm tuyệt đối</p>
+        </div>
+
+        <div class="row g-4 text-center">
+            <div class="col-md-3 col-sm-6">
+                <div class="p-4 rounded-4 bg-light h-100">
+                    <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px;">
+                        <i class="bi bi-tag-fill fs-2"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Giá Tốt Nhất Cam Kết</h5>
+                    <p class="text-muted small mb-0">Đảm bảo giá phòng ưu đãi nhất, không phụ phí ẩn, hoàn tiền chênh lệch nếu tìm thấy giá rẻ hơn.</p>
+                </div>
+            </div>
+
+            <div class="col-md-3 col-sm-6">
+                <div class="p-4 rounded-4 bg-light h-100">
+                    <div class="bg-success bg-opacity-10 text-success rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px;">
+                        <i class="bi bi-shield-lock-fill fs-2"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Xác Nhận Tức Thì</h5>
+                    <p class="text-muted small mb-0">Nhận ngay mã đặt phòng điện tử qua email & SMS chỉ sau 30 giây thanh toán thành công.</p>
+                </div>
+            </div>
+
+            <div class="col-md-3 col-sm-6">
+                <div class="p-4 rounded-4 bg-light h-100">
+                    <div class="bg-warning bg-opacity-10 text-warning rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px;">
+                        <i class="bi bi-headset fs-2 text-dark"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Hỗ Trợ 24/7 Tận Tâm</h5>
+                    <p class="text-muted small mb-0">Đội ngũ chuyên viên túc trực 24/7 sẵn sàng giải đáp mọi thắc mắc và hỗ trợ nhận phòng dễ dàng.</p>
+                </div>
+            </div>
+
+            <div class="col-md-3 col-sm-6">
+                <div class="p-4 rounded-4 bg-light h-100">
+                    <div class="bg-danger bg-opacity-10 text-danger rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px;">
+                        <i class="bi bi-arrow-repeat fs-2"></i>
+                    </div>
+                    <h5 class="fw-bold mb-2">Hủy Phòng Linh Hoạt</h5>
+                    <p class="text-muted small mb-0">Chính sách hủy phòng và hoàn tiền thuận tiện nếu có thay đổi trong kế hoạch chuyến đi.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Customer Reviews Section -->
+<section class="container py-5 my-2">
+    <div class="text-center mb-5">
+        <span class="text-primary fw-bold text-uppercase small tracking-wider"><i class="bi bi-chat-quote-fill me-1"></i> Đánh Giá Từ Khách Hàng</span>
+        <h2 class="fw-extrabold text-dark tracking-tight">Trải Nghiệm Thật Của Khách Hàng</h2>
+        <p class="text-muted">Hơn 50,000+ du khách đã tin tưởng lựa chọn dịch vụ đặt phòng của chúng tôi</p>
+    </div>
+
+    <div class="row g-4">
+        @foreach (var review in Model.RecentReviews)
+        {
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm rounded-4 p-4 h-100 bg-white">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-primary bg-opacity-10 text-primary rounded-circle me-3 d-flex align-items-center justify-content-center fw-bold" style="width: 48px; height: 48px;">
+                            @review.CustomerName.Substring(0, 1)
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-0 text-dark">@review.CustomerName</h6>
+                            <small class="text-muted"><i class="bi bi-building me-1"></i> @review.Hotel?.Name</small>
+                        </div>
+                    </div>
+                    <div class="star-rating mb-2">
+                        @for (int i = 0; i < review.Rating; i++)
+                        {
+                            <i class="bi bi-star-fill"></i>
+                        }
+                    </div>
+                    <h6 class="fw-bold text-dark mb-2">"@review.Title"</h6>
+                    <p class="text-muted small mb-0 italic">
+                        "@review.Comment"
+                    </p>
+                    <div class="mt-3 pt-3 border-top text-end">
+                        <small class="text-muted"><i class="bi bi-clock me-1"></i> @review.CreatedAt.ToString("dd/MM/yyyy")</small>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</section>

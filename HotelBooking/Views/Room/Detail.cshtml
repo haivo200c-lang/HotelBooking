@@ -1,0 +1,214 @@
+@model HotelBooking.Models.ViewModels.RoomDetailViewModel
+@{
+    ViewData["Title"] = Model.Room.Name + " - " + Model.Hotel.Name;
+}
+
+<div class="container py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb small">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-decoration-none">Trang chủ</a></li>
+            <li class="breadcrumb-item"><a asp-controller="Hotel" asp-action="Index" class="text-decoration-none">Khách sạn</a></li>
+            <li class="breadcrumb-item"><a asp-controller="Hotel" asp-action="Detail" asp-route-id="@Model.Hotel.Id" class="text-decoration-none">@Model.Hotel.Name</a></li>
+            <li class="breadcrumb-item active" aria-current="page">@Model.Room.Name</li>
+        </ol>
+    </nav>
+
+    <div class="row g-4">
+        <!-- Room Information & Specs (Left Column) -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4 bg-white">
+                <div class="position-relative" style="height: 400px;">
+                    <img src="@Model.Room.ImageUrl" class="w-100 h-100" style="object-fit: cover;" alt="@Model.Room.Name" />
+                    <span class="badge bg-primary position-absolute top-0 start-0 m-3 px-3 py-2 rounded-pill fw-bold">
+                        <i class="bi bi-star-fill me-1"></i> @Model.Room.RoomType?.Name
+                    </span>
+                    <span class="badge bg-success position-absolute top-0 end-0 m-3 px-3 py-2 rounded-pill fw-bold">
+                        <i class="bi bi-check-circle me-1"></i> Còn @Model.Room.AvailableQuantity phòng trống
+                    </span>
+                </div>
+
+                <div class="p-4 p-md-5">
+                    <h2 class="fw-extrabold text-dark mb-1">@Model.Room.Name</h2>
+                    <p class="text-muted small mb-4">
+                        <i class="bi bi-building text-primary me-1"></i> Thuộc khách sạn: 
+                        <a asp-controller="Hotel" asp-action="Detail" asp-route-id="@Model.Hotel.Id" class="fw-bold text-primary text-decoration-none">@Model.Hotel.Name</a>
+                    </p>
+
+                    <!-- Key Room Specs Grid -->
+                    <div class="row g-3 p-3 bg-light rounded-4 mb-4 text-center">
+                        <div class="col-sm-3 col-6 border-end">
+                            <i class="bi bi-arrows-fullscreen text-primary fs-3 d-block mb-1"></i>
+                            <span class="d-block small text-muted">Diện tích</span>
+                            <strong class="text-dark">@Model.Room.AreaM2 m²</strong>
+                        </div>
+                        <div class="col-sm-3 col-6 border-end">
+                            <i class="bi bi-people-fill text-success fs-3 d-block mb-1"></i>
+                            <span class="d-block small text-muted">Sức chứa</span>
+                            <strong class="text-dark">Tối đa @Model.Room.Capacity khách</strong>
+                        </div>
+                        <div class="col-sm-3 col-6 border-end">
+                            <i class="bi bi-lamp-fill text-warning fs-3 d-block mb-1"></i>
+                            <span class="d-block small text-muted">Kiểu giường</span>
+                            <strong class="text-dark small">@Model.Room.BedInfo</strong>
+                        </div>
+                        <div class="col-sm-3 col-6">
+                            <i class="bi bi-eye-fill text-danger fs-3 d-block mb-1"></i>
+                            <span class="d-block small text-muted">Tầm nhìn</span>
+                            <strong class="text-dark">View Đẹp</strong>
+                        </div>
+                    </div>
+
+                    <h4 class="fw-bold text-dark mb-3">Mô Tả Chi Tiết Phòng</h4>
+                    <p class="text-muted leading-relaxed mb-4">
+                        @Model.Room.Description
+                    </p>
+
+                    <h4 class="fw-bold text-dark mb-3">Tiện Nghi Có Sẵn Trong Phòng</h4>
+                    <div class="row g-2">
+                        @foreach (var ra in Model.Room.RoomAmenities)
+                        {
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center p-2 rounded-3 bg-light">
+                                    <i class="bi @ra.Amenity?.Icon text-primary fs-5 me-2"></i>
+                                    <span class="small fw-semibold text-dark">@ra.Amenity?.Name</span>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sticky Interactive Booking & Price Calculation Widget (Right Column) -->
+        <div class="col-lg-4">
+            <div class="sticky-booking-widget">
+                <div class="d-flex justify-content-between align-items-baseline mb-3">
+                    <span class="text-muted small">Giá gốc 1 đêm</span>
+                    <div>
+                        <span class="fs-3 fw-extrabold text-primary" id="unitPriceDisplay">@Model.Room.PricePerNight.ToString("N0")</span>
+                        <span class="text-muted small"> đ / đêm</span>
+                    </div>
+                </div>
+
+                <hr class="my-3 opacity-25" />
+
+                <!-- Booking Options Form -->
+                <form asp-controller="Booking" asp-action="Checkout" method="get">
+                    <input type="hidden" name="hotelId" value="@Model.Hotel.Id" />
+                    <input type="hidden" name="roomId" value="@Model.Room.Id" />
+                    <input type="hidden" id="rawUnitPrice" value="@Model.Room.PricePerNight" />
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted"><i class="bi bi-calendar-check text-primary me-1"></i> NGÀY NHẬN PHÒNG</label>
+                        <input type="date" name="checkIn" id="checkInInput" class="form-control bg-light py-2 rounded-3 fw-semibold" value="@Model.CheckInDate.ToString("yyyy-MM-dd")" min="@DateTime.Today.ToString("yyyy-MM-dd")" onchange="calculatePrice()" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted"><i class="bi bi-calendar-x text-primary me-1"></i> NGÀY TRẢ PHÒNG</label>
+                        <input type="date" name="checkOut" id="checkOutInput" class="form-control bg-light py-2 rounded-3 fw-semibold" value="@Model.CheckOutDate.ToString("yyyy-MM-dd")" min="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")" onchange="calculatePrice()" required />
+                    </div>
+
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label class="form-label small fw-bold text-muted"><i class="bi bi-door-closed text-success me-1"></i> SỐ PHÒNG</label>
+                            <select name="quantity" id="quantityInput" class="form-select bg-light py-2 rounded-3 fw-semibold" onchange="calculatePrice()">
+                                @for (int q = 1; q <= Math.Min(5, Model.Room.AvailableQuantity); q++)
+                                {
+                                    <option value="@q" selected="@(q == Model.Quantity)">@q Phòng</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small fw-bold text-muted"><i class="bi bi-people text-warning me-1"></i> SỐ KHÁCH</label>
+                            <select name="guests" id="guestsInput" class="form-select bg-light py-2 rounded-3 fw-semibold">
+                                @for (int g = 1; g <= Model.Room.Capacity * 3; g++)
+                                {
+                                    <option value="@g" selected="@(g == Model.Guests)">@g Khách</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Real-Time Price Breakdown Card -->
+                    <div class="p-3 bg-light rounded-4 mb-4">
+                        <h6 class="fw-bold text-dark mb-2 small text-uppercase">Bảng Tính Chi Phí Chi Tiết</h6>
+                        <div class="d-flex justify-content-between small text-muted mb-1">
+                            <span>Thời gian lưu trú:</span>
+                            <span class="fw-bold text-dark" id="calcNights">@Model.TotalNights đêm</span>
+                        </div>
+                        <div class="d-flex justify-content-between small text-muted mb-1">
+                            <span>Số lượng phòng:</span>
+                            <span class="fw-bold text-dark" id="calcRooms">@Model.Quantity phòng</span>
+                        </div>
+                        <div class="d-flex justify-content-between small text-muted mb-1">
+                            <span>Tiền phòng tạm tính:</span>
+                            <span class="fw-bold text-dark" id="calcSubTotal">@Model.SubTotal.ToString("N0") đ</span>
+                        </div>
+                        <div class="d-flex justify-content-between small text-muted mb-1">
+                            <span>Thuế VAT (8%):</span>
+                            <span class="text-dark" id="calcTax">@Model.TaxAmount.ToString("N0") đ</span>
+                        </div>
+                        <div class="d-flex justify-content-between small text-muted mb-2">
+                            <span>Phí dịch vụ & vệ sinh (5%):</span>
+                            <span class="text-dark" id="calcFee">@Model.ServiceFee.ToString("N0") đ</span>
+                        </div>
+                        <hr class="my-2" />
+                        <div class="d-flex justify-content-between align-items-center">
+                            <strong class="text-dark">Tổng Tiền:</strong>
+                            <span class="fs-4 fw-extrabold text-danger" id="calcTotal">@Model.TotalAmount.ToString("N0") đ</span>
+                        </div>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg rounded-pill fw-bold py-3 shadow-sm d-flex align-items-center justify-content-center gap-2" style="background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%); border: none;">
+                            <i class="bi bi-lightning-charge-fill text-warning"></i> Tiến Hành Đặt Phòng
+                        </button>
+                    </div>
+
+                    <div class="text-center mt-3 small text-muted">
+                        <i class="bi bi-shield-check text-success me-1"></i> Cam kết không phụ thu khi nhận phòng
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function calculatePrice() {
+            const checkInVal = document.getElementById('checkInInput').value;
+            const checkOutVal = document.getElementById('checkOutInput').value;
+            const quantity = parseInt(document.getElementById('quantityInput').value) || 1;
+            const unitPrice = parseFloat(document.getElementById('rawUnitPrice').value) || 0;
+
+            if (!checkInVal || !checkOutVal) return;
+
+            const checkIn = new Date(checkInVal);
+            const checkOut = new Date(checkOutVal);
+
+            let diffTime = checkOut.getTime() - checkIn.getTime();
+            let nights = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            if (nights <= 0) {
+                nights = 1;
+                // auto bump checkOut date
+                const nextDay = new Date(checkIn);
+                nextDay.setDate(nextDay.getDate() + 1);
+                document.getElementById('checkOutInput').value = nextDay.toISOString().split('T')[0];
+            }
+
+            const subTotal = unitPrice * nights * quantity;
+            const tax = Math.round(subTotal * 0.08);
+            const fee = Math.round(subTotal * 0.05);
+            const total = subTotal + tax + fee;
+
+            document.getElementById('calcNights').innerText = `${nights} đêm`;
+            document.getElementById('calcRooms').innerText = `${quantity} phòng`;
+            document.getElementById('calcSubTotal').innerText = `${subTotal.toLocaleString('vi-VN')} đ`;
+            document.getElementById('calcTax').innerText = `${tax.toLocaleString('vi-VN')} đ`;
+            document.getElementById('calcFee').innerText = `${fee.toLocaleString('vi-VN')} đ`;
+            document.getElementById('calcTotal').innerText = `${total.toLocaleString('vi-VN')} đ`;
+        }
+    </script>
+}

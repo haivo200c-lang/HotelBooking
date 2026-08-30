@@ -1,0 +1,166 @@
+@model HotelBooking.Models.Entities.Booking
+@{
+    ViewData["Title"] = "Đặt Phòng Thành Công - " + Model.BookingCode;
+}
+
+<div class="container py-4 my-2">
+    <!-- Step Progress Bar -->
+    <div class="card border-0 shadow-sm rounded-4 p-3 mb-4 bg-white d-print-none">
+        <div class="row text-center">
+            <div class="col-4">
+                <span class="badge bg-success rounded-circle p-2 px-3 fw-bold me-1"><i class="bi bi-check"></i></span>
+                <span class="fw-semibold text-muted small">Thông Tin Đặt Phòng</span>
+            </div>
+            <div class="col-4">
+                <span class="badge bg-success rounded-circle p-2 px-3 fw-bold me-1"><i class="bi bi-check"></i></span>
+                <span class="fw-semibold text-muted small">Thanh Toán Demo</span>
+            </div>
+            <div class="col-4">
+                <span class="badge bg-success rounded-circle p-2 px-3 fw-bold me-1"><i class="bi bi-check"></i></span>
+                <span class="fw-bold text-success small">Xác Nhận Thành Công</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden bg-white mb-4">
+                <!-- Success Header -->
+                <div class="p-4 p-md-5 text-center bg-success bg-opacity-10 border-bottom border-success border-opacity-25">
+                    <div class="d-inline-flex align-items-center justify-content-center bg-success text-white rounded-circle mb-3 shadow-sm" style="width: 75px; height: 75px;">
+                        <i class="bi bi-check-lg display-4"></i>
+                    </div>
+                    <h2 class="fw-extrabold text-success mb-1">Đặt Phòng Thành Công!</h2>
+                    <p class="text-muted mb-3">Cảm ơn quý khách đã tin tưởng và sử dụng dịch vụ của Luxury Hotel Booking.</p>
+                    
+                    <div class="d-inline-block bg-white p-3 px-4 rounded-4 shadow-sm border">
+                        <span class="small text-muted d-block fw-semibold text-uppercase">MÃ ĐƠN ĐẶT PHÒNG (BOOKING CODE)</span>
+                        <span class="fs-3 fw-extrabold text-primary font-monospace">@Model.BookingCode</span>
+                    </div>
+                </div>
+
+                <div class="card-body p-4 p-md-5">
+                    <!-- Hotel & Stay Info -->
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-6">
+                            <h6 class="fw-bold text-dark text-uppercase small mb-2"><i class="bi bi-building text-primary me-1"></i> Thông Tin Khách Sạn</h6>
+                            <h5 class="fw-bold text-dark mb-1">@Model.Hotel?.Name</h5>
+                            <p class="text-muted small mb-1"><i class="bi bi-geo-alt me-1 text-danger"></i> @Model.Hotel?.Address, @Model.Hotel?.City</p>
+                            <p class="text-muted small mb-0"><i class="bi bi-telephone me-1 text-success"></i> @Model.Hotel?.Phone</p>
+                        </div>
+
+                        <div class="col-md-6">
+                            <h6 class="fw-bold text-dark text-uppercase small mb-2"><i class="bi bi-person text-primary me-1"></i> Thông Tin Khách Đặt</h6>
+                            <p class="mb-1 text-dark"><strong>Họ tên:</strong> @Model.CustomerName</p>
+                            <p class="mb-1 text-muted small"><strong>Email:</strong> @Model.CustomerEmail</p>
+                            <p class="mb-0 text-muted small"><strong>SĐT:</strong> @Model.CustomerPhone</p>
+                        </div>
+                    </div>
+
+                    <div class="p-3 bg-light rounded-4 mb-4">
+                        <div class="row text-center g-2">
+                            <div class="col-sm-3 col-6 border-end">
+                                <span class="small text-muted d-block">Ngày nhận phòng</span>
+                                <strong class="text-dark">@Model.CheckInDate.ToString("dd/MM/yyyy")</strong>
+                            </div>
+                            <div class="col-sm-3 col-6 border-end">
+                                <span class="small text-muted d-block">Ngày trả phòng</span>
+                                <strong class="text-dark">@Model.CheckOutDate.ToString("dd/MM/yyyy")</strong>
+                            </div>
+                            <div class="col-sm-3 col-6 border-end">
+                                <span class="small text-muted d-block">Thời gian</span>
+                                <strong class="text-primary">@Model.TotalNights đêm</strong>
+                            </div>
+                            <div class="col-sm-3 col-6">
+                                <span class="small text-muted d-block">Số lượng</span>
+                                <strong class="text-dark">@Model.TotalRooms phòng, @Model.TotalGuests khách</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Room Details Table -->
+                    <h6 class="fw-bold text-dark text-uppercase small mb-2"><i class="bi bi-door-open text-primary me-1"></i> Chi Tiết Hạng Phòng</h6>
+                    <div class="table-responsive mb-4">
+                        <table class="table table-borderless table-striped align-middle rounded-3 overflow-hidden">
+                            <thead class="table-light">
+                                <tr class="small text-muted">
+                                    <th>Hạng Phòng</th>
+                                    <th class="text-center">Số Phòng</th>
+                                    <th class="text-center">Số Đêm</th>
+                                    <th class="text-end">Đơn Giá / Đêm</th>
+                                    <th class="text-end">Thành Tiền</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var detail in Model.BookingDetails)
+                                {
+                                    <tr>
+                                        <td>
+                                            <strong class="text-dark">@detail.RoomName</strong>
+                                        </td>
+                                        <td class="text-center">@detail.Quantity</td>
+                                        <td class="text-center">@detail.Nights</td>
+                                        <td class="text-end">@detail.PricePerNight.ToString("N0") đ</td>
+                                        <td class="text-end fw-bold text-dark">@detail.SubTotal.ToString("N0") đ</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Payment Status & Breakdown -->
+                    <div class="row g-4 align-items-center mb-4">
+                        <div class="col-md-6">
+                            <div class="p-3 bg-light rounded-3">
+                                <span class="small text-muted d-block mb-1">Trạng thái thanh toán:</span>
+                                @if (Model.Payment?.Status == "Completed")
+                                {
+                                    <span class="badge bg-success px-3 py-2 rounded-pill"><i class="bi bi-check-circle me-1"></i> Đã Thanh Toán (@Model.Payment.PaymentMethod)</span>
+                                    <small class="d-block text-muted mt-2">Mã GD: <strong class="font-monospace">@Model.Payment.TransactionRef</strong></small>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning text-dark px-3 py-2 rounded-pill"><i class="bi bi-clock me-1"></i> Chờ Thanh Toán (Tại khách sạn)</span>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="text-end">
+                                <div class="d-flex justify-content-between text-muted small mb-1">
+                                    <span>Tạm tính tiền phòng:</span>
+                                    <span>@Model.SubTotal.ToString("N0") đ</span>
+                                </div>
+                                <div class="d-flex justify-content-between text-muted small mb-1">
+                                    <span>Thuế VAT (8%):</span>
+                                    <span>@Model.TaxAmount.ToString("N0") đ</span>
+                                </div>
+                                <div class="d-flex justify-content-between text-muted small mb-2">
+                                    <span>Phí dịch vụ (5%):</span>
+                                    <span>@Model.ServiceFee.ToString("N0") đ</span>
+                                </div>
+                                <div class="d-flex justify-content-between fs-5 fw-bold text-dark pt-2 border-top">
+                                    <span>Tổng cộng:</span>
+                                    <span class="text-danger">@Model.TotalAmount.ToString("N0") đ</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex flex-column flex-sm-row justify-content-center gap-3 pt-4 border-top d-print-none">
+                        <button type="button" class="btn btn-outline-dark rounded-pill px-4 py-2 fw-semibold" onclick="window.print()">
+                            <i class="bi bi-printer me-1"></i> In Phiếu Đặt Phòng
+                        </button>
+                        <a asp-action="History" class="btn btn-outline-primary rounded-pill px-4 py-2 fw-semibold">
+                            <i class="bi bi-receipt me-1"></i> Quản Lý Lịch Sử Đặt
+                        </a>
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-primary rounded-pill px-4 py-2 fw-bold shadow-sm">
+                            <i class="bi bi-house-door me-1"></i> Quay Lại Trang Chủ
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

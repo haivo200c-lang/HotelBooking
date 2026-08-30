@@ -1,0 +1,259 @@
+@using Microsoft.AspNetCore.Identity
+@using HotelBooking.Models.Entities
+@inject SignInManager<AppUser> SignInManager
+@inject UserManager<AppUser> UserManager
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - LUXURY HOTEL BOOKING</title>
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- FontAwesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Custom Site CSS -->
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body class="d-flex flex-column min-vh-100">
+    <!-- Top Contact Bar -->
+    <div class="bg-dark text-white py-1 small d-none d-md-block" style="background-color: #0b1d2e !important;">
+        <div class="container d-flex justify-content-between align-items-center">
+            <div>
+                <span class="me-3"><i class="bi bi-telephone text-warning me-1"></i> Hotline 24/7: <strong>1900 8888</strong></span>
+                <span><i class="bi bi-envelope text-warning me-1"></i> booking@luxuryhotel.vn</span>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <span><i class="bi bi-geo-alt text-warning me-1"></i> Việt Nam</span>
+                <span class="text-white-50">|</span>
+                <span class="badge bg-warning text-dark fw-bold">Ưu đãi giảm tới 30%</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-custom sticky-top">
+        <div class="container">
+            <a class="navbar-brand text-primary d-flex align-items-center" asp-controller="Home" asp-action="Index">
+                <div class="bg-primary text-white p-2 rounded-3 me-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                    <i class="bi bi-buildings-fill fs-5"></i>
+                </div>
+                <div>
+                    <span class="fw-extrabold tracking-tight text-dark">HOTEL</span><span class="text-primary fw-extrabold">BOOKING</span>
+                </div>
+            </a>
+
+            <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain" aria-controls="navbarMain" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarMain">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
+                    <li class="nav-item">
+                        <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" && ViewContext.RouteData.Values["action"]?.ToString() == "Index" ? "active text-primary" : "")" asp-controller="Home" asp-action="Index">
+                            <i class="bi bi-house-door me-1"></i> Trang Chủ
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Hotel" ? "active text-primary" : "")" asp-controller="Hotel" asp-action="Index">
+                            <i class="bi bi-building me-1"></i> Khách Sạn
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Deals" ? "active text-primary" : "")" asp-controller="Home" asp-action="Deals">
+                            <i class="bi bi-tags-fill me-1 text-danger"></i> Ưu Đãi Hot
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "About" ? "active text-primary" : "")" asp-controller="Home" asp-action="About">
+                            <i class="bi bi-info-circle me-1"></i> Giới Thiệu
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Contact" ? "active text-primary" : "")" asp-controller="Home" asp-action="Contact">
+                            <i class="bi bi-headset me-1"></i> Liên Hệ
+                        </a>
+                    </li>
+                </ul>
+
+                <div class="d-flex align-items-center gap-2">
+                    @if (SignInManager.IsSignedIn(User))
+                    {
+                        var currentUser = await UserManager.GetUserAsync(User);
+                        var isAdmin = User.IsInRole("Admin") || User.IsInRole("Staff");
+
+                        if (isAdmin)
+                        {
+                            <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="btn btn-outline-danger btn-sm rounded-pill fw-bold px-3 me-2">
+                                <i class="bi bi-speedometer2 me-1"></i> Admin Portal
+                            </a>
+                        }
+
+                        <div class="dropdown">
+                            <button class="btn btn-light rounded-pill border d-flex align-items-center py-1 px-3 dropdown-toggle shadow-sm" type="button" id="userMenu" data-bs-toggle="dropdown" aria-expanded="false">
+                                <div class="bg-primary text-white rounded-circle me-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                    <i class="bi bi-person-fill"></i>
+                                </div>
+                                <span class="fw-semibold text-dark small me-1">@(currentUser?.FullName ?? User.Identity?.Name)</span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-4 p-2 mt-2" aria-labelledby="userMenu" style="min-width: 220px;">
+                                <li>
+                                    <div class="px-3 py-2 border-bottom">
+                                        <p class="mb-0 fw-bold text-dark small">@(currentUser?.FullName ?? "Tài khoản")</p>
+                                        <small class="text-muted">@(currentUser?.Email ?? "")</small>
+                                    </div>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item rounded-3 py-2 mt-1" asp-controller="Account" asp-action="Profile">
+                                        <i class="bi bi-person-gear me-2 text-primary"></i> Hồ sơ cá nhân
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item rounded-3 py-2" asp-controller="Booking" asp-action="History">
+                                        <i class="bi bi-receipt me-2 text-success"></i> Lịch sử đặt phòng
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item rounded-3 py-2" asp-controller="Hotel" asp-action="Favorites">
+                                        <i class="bi bi-heart-fill me-2 text-danger"></i> Khách sạn yêu thích
+                                    </a>
+                                </li>
+                                @if (isAdmin)
+                                {
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a class="dropdown-item rounded-3 py-2 text-danger fw-bold" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">
+                                            <i class="bi bi-shield-lock-fill me-2"></i> Trang Quản Trị (Admin)
+                                        </a>
+                                    </li>
+                                }
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item rounded-3 py-2 text-muted" asp-controller="Account" asp-action="Logout">
+                                        <i class="bi bi-box-arrow-right me-2"></i> Đăng xuất
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    }
+                    else
+                    {
+                        <a asp-controller="Account" asp-action="Login" class="btn btn-outline-primary rounded-pill px-4 fw-semibold">
+                            <i class="bi bi-box-arrow-in-right me-1"></i> Đăng Nhập
+                        </a>
+                        <a asp-controller="Account" asp-action="Register" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm">
+                            <i class="bi bi-person-plus me-1"></i> Đăng Ký
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Global Toast / Alerts -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="container mt-3">
+            <div class="alert alert-success alert-dismissible fade show rounded-3 shadow-sm d-flex align-items-center" role="alert">
+                <i class="bi bi-check-circle-fill fs-5 me-2"></i>
+                <div>@TempData["SuccessMessage"]</div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="container mt-3">
+            <div class="alert alert-danger alert-dismissible fade show rounded-3 shadow-sm d-flex align-items-center" role="alert">
+                <i class="bi bi-exclamation-triangle-fill fs-5 me-2"></i>
+                <div>@TempData["ErrorMessage"]</div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </div>
+    }
+
+    <!-- Main Body Content -->
+    <main role="main" class="flex-grow-1">
+        @RenderBody()
+    </main>
+
+    <!-- Modern Footer -->
+    <footer class="footer-custom mt-auto">
+        <div class="container">
+            <div class="row g-4 mb-5">
+                <div class="col-lg-4 col-md-6">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-primary text-white p-2 rounded-3 me-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                            <i class="bi bi-buildings-fill fs-5"></i>
+                        </div>
+                        <h4 class="text-white fw-bold mb-0">HOTEL BOOKING</h4>
+                    </div>
+                    <p class="text-white-50 pe-lg-4">
+                        Nền tảng đặt phòng khách sạn trực tuyến hàng đầu Việt Nam. Mang đến kỳ nghỉ hoàn hảo với những trải nghiệm nghỉ dưỡng 5 sao đẳng cấp và ưu đãi độc quyền.
+                    </p>
+                    <div class="d-flex gap-2 mt-3">
+                        <a href="#" class="btn btn-outline-light btn-sm rounded-circle" style="width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center;"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="btn btn-outline-light btn-sm rounded-circle" style="width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center;"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="btn btn-outline-light btn-sm rounded-circle" style="width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center;"><i class="fab fa-youtube"></i></a>
+                        <a href="#" class="btn btn-outline-light btn-sm rounded-circle" style="width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center;"><i class="fab fa-tiktok"></i></a>
+                    </div>
+                </div>
+
+                <div class="col-lg-2 col-md-6">
+                    <h5 class="footer-heading">Điểm Đến Hấp Dẫn</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a asp-controller="Hotel" asp-action="Index" asp-route-City="Đà Nẵng">Khách sạn Đà Nẵng</a></li>
+                        <li class="mb-2"><a asp-controller="Hotel" asp-action="Index" asp-route-City="Phú Quốc">Khách sạn Phú Quốc</a></li>
+                        <li class="mb-2"><a asp-controller="Hotel" asp-action="Index" asp-route-City="Hà Nội">Khách sạn Hà Nội</a></li>
+                        <li class="mb-2"><a asp-controller="Hotel" asp-action="Index" asp-route-City="Nha Trang">Khách sạn Nha Trang</a></li>
+                        <li class="mb-2"><a asp-controller="Hotel" asp-action="Index" asp-route-City="Sapa">Khách sạn Sapa</a></li>
+                        <li class="mb-2"><a asp-controller="Hotel" asp-action="Index" asp-route-City="TP. Hồ Chí Minh">Khách sạn Sài Gòn</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-3 col-md-6">
+                    <h5 class="footer-heading">Chính Sách & Hỗ Trợ</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="#">Điều khoản sử dụng</a></li>
+                        <li class="mb-2"><a href="#">Chính sách bảo mật</a></li>
+                        <li class="mb-2"><a href="#">Quy định đặt phòng & hủy phòng</a></li>
+                        <li class="mb-2"><a href="#">Hướng dẫn thanh toán</a></li>
+                        <li class="mb-2"><a href="#">Trung tâm trợ giúp khách hàng</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-3 col-md-6">
+                    <h5 class="footer-heading">Liên Hệ Chúng Tôi</h5>
+                    <p class="mb-2"><i class="bi bi-geo-alt text-warning me-2"></i> Tòa nhà Landmark, 720A Điện Biên Phủ, TP.HCM</p>
+                    <p class="mb-2"><i class="bi bi-telephone text-warning me-2"></i> 1900 8888 (24/7)</p>
+                    <p class="mb-3"><i class="bi bi-envelope text-warning me-2"></i> support@hotelbooking.vn</p>
+                    <div class="bg-white bg-opacity-10 p-3 rounded-3">
+                        <small class="d-block text-white fw-bold mb-1">Phương thức thanh toán hỗ trợ:</small>
+                        <div class="d-flex gap-2 align-items-center">
+                            <span class="badge bg-danger">VNPay</span>
+                            <span class="badge bg-primary">MoMo</span>
+                            <span class="badge bg-success">ATM / Thẻ</span>
+                            <span class="badge bg-secondary">Tiền mặt</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="border-secondary opacity-25">
+
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center pt-3 small text-white-50">
+                <p class="mb-0">© 2026 Hotel Booking System - Đồ án tốt nghiệp / Presentation Demo Website.</p>
+                <p class="mb-0">Được xây dựng với ASP.NET Core MVC & Bootstrap 5</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5.3 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

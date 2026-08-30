@@ -1,0 +1,145 @@
+@model HotelBooking.Models.ViewModels.ProfileViewModel
+@{
+    ViewData["Title"] = "Hồ Sơ Cá Nhân";
+}
+
+<div class="container py-5 my-3">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-decoration-none">Trang chủ</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Hồ sơ cá nhân</li>
+        </ol>
+    </nav>
+
+    <div class="row g-4">
+        <!-- User Sidebar Card -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden text-center p-4">
+                <div class="position-relative d-inline-block mx-auto mb-3">
+                    <div class="rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center mx-auto" style="width: 100px; height: 100px;">
+                        <i class="bi bi-person-fill display-4"></i>
+                    </div>
+                    <span class="position-absolute bottom-0 end-0 bg-success border border-white border-2 rounded-circle p-2" title="Tài khoản đang hoạt động"></span>
+                </div>
+                <h5 class="fw-bold mb-1">@Model.FullName</h5>
+                <p class="text-muted small mb-2"><i class="bi bi-envelope me-1"></i> @Model.Email</p>
+                <div class="mb-3">
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <span class="badge bg-danger px-3 py-2 rounded-pill"><i class="bi bi-shield-lock me-1"></i> Quản Trị Viên (Admin)</span>
+                    }
+                    else if (User.IsInRole("Staff"))
+                    {
+                        <span class="badge bg-warning text-dark px-3 py-2 rounded-pill"><i class="bi bi-person-workspace me-1"></i> Nhân Viên (Staff)</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-primary px-3 py-2 rounded-pill"><i class="bi bi-person-check me-1"></i> Khách Hàng Thân Thiết</span>
+                    }
+                </div>
+                <hr />
+                <div class="list-group list-group-flush text-start rounded-3">
+                    <a asp-action="Profile" class="list-group-item list-group-item-action active rounded-3 mb-1 py-2 fw-semibold">
+                        <i class="bi bi-person-gear me-2"></i> Thông Tin Cá Nhân
+                    </a>
+                    <a asp-controller="Booking" asp-action="History" class="list-group-item list-group-item-action rounded-3 mb-1 py-2 fw-semibold">
+                        <i class="bi bi-calendar2-check me-2"></i> Lịch Sử Đặt Phòng
+                    </a>
+                    <a asp-controller="Hotel" asp-action="Favorites" class="list-group-item list-group-item-action rounded-3 mb-1 py-2 fw-semibold">
+                        <i class="bi bi-heart me-2"></i> Khách Sạn Yêu Thích
+                    </a>
+                    @if (User.IsInRole("Admin") || User.IsInRole("Staff"))
+                    {
+                        <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="list-group-item list-group-item-action list-group-item-danger rounded-3 mb-1 py-2 fw-semibold">
+                            <i class="bi bi-speedometer2 me-2"></i> Đến Trang Quản Trị (Admin)
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content (Edit Info & Change Password) -->
+        <div class="col-lg-8">
+            <!-- Edit Profile Card -->
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-header bg-white border-0 pt-4 pb-0">
+                    <h5 class="fw-bold text-dark mb-0"><i class="bi bi-pencil-square me-2 text-primary"></i> Chỉnh Sửa Thông Tin Cá Nhân</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="Profile" method="post">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small"></div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label asp-for="FullName" class="form-label fw-semibold small text-muted">HỌ VÀ TÊN</label>
+                                <input asp-for="FullName" class="form-control bg-light py-2 rounded-3" required />
+                                <span asp-validation-for="FullName" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="Email" class="form-label fw-semibold small text-muted">EMAIL (CỐ ĐỊNH)</label>
+                                <input asp-for="Email" class="form-control bg-light py-2 rounded-3" readonly disabled />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="PhoneNumber" class="form-label fw-semibold small text-muted">SỐ ĐIỆN THOẠI</label>
+                                <input asp-for="PhoneNumber" class="form-control bg-light py-2 rounded-3" placeholder="0912345678" />
+                                <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label asp-for="Address" class="form-label fw-semibold small text-muted">ĐỊA CHỈ</label>
+                                <input asp-for="Address" class="form-control bg-light py-2 rounded-3" placeholder="Hà Nội, Việt Nam..." />
+                                <span asp-validation-for="Address" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 text-end">
+                            <button type="submit" class="btn btn-primary px-4 py-2 rounded-3 fw-bold shadow-sm">
+                                <i class="bi bi-check2-circle me-1"></i> Lưu Thay Đổi
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Change Password Card -->
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-header bg-white border-0 pt-4 pb-0">
+                    <h5 class="fw-bold text-dark mb-0"><i class="bi bi-shield-lock me-2 text-warning"></i> Đổi Mật Khẩu</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="ChangePassword" method="post">
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <label class="form-label fw-semibold small text-muted">MẬT KHẨU HIỆN TẠI</label>
+                                <input name="CurrentPassword" type="password" class="form-control bg-light py-2 rounded-3" placeholder="••••••••" required />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold small text-muted">MẬT KHẨU MỚI</label>
+                                <input name="NewPassword" type="password" class="form-control bg-light py-2 rounded-3" placeholder="Tối thiểu 6 ký tự" required />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold small text-muted">XÁC NHẬN MẬT KHẨU MỚI</label>
+                                <input name="ConfirmNewPassword" type="password" class="form-control bg-light py-2 rounded-3" placeholder="Nhập lại mật khẩu mới" required />
+                            </div>
+                        </div>
+
+                        <div class="mt-4 text-end">
+                            <button type="submit" class="btn btn-outline-warning text-dark px-4 py-2 rounded-3 fw-bold shadow-sm">
+                                <i class="bi bi-key me-1"></i> Cập Nhật Mật Khẩu
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

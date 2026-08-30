@@ -1,0 +1,133 @@
+@model List<HotelBooking.Models.Entities.Room>
+@{
+    ViewData["Title"] = "Quản Lý Hạng Phòng";
+    var hotels = ViewBag.Hotels as List<HotelBooking.Models.Entities.Hotel> ?? new List<HotelBooking.Models.Entities.Hotel>();
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="fw-bold text-dark mb-1">Danh Sách Hạng Phòng</h4>
+        <p class="text-muted small mb-0">Quản lý cấu hình phòng, giá niêm yết và số lượng phòng khả dụng</p>
+    </div>
+    <a asp-action="Create" asp-route-hotelId="@ViewBag.CurrentHotelId" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm">
+        <i class="bi bi-plus-lg me-1"></i> Thêm Hạng Phòng Mới
+    </a>
+</div>
+
+<!-- Hotel Filter Bar -->
+<div class="card border-0 shadow-sm rounded-4 p-3 bg-white mb-4">
+    <form method="get" class="row g-2 align-items-center">
+        <div class="col-md-8">
+            <select name="hotelId" class="form-select bg-light" onchange="this.form.submit()">
+                <option value="">-- Tất cả khách sạn --</option>
+                @foreach (var h in hotels)
+                {
+                    <option value="@h.Id" selected="@(ViewBag.CurrentHotelId == h.Id)">@h.Name (@h.City)</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-4 d-grid">
+            <a asp-action="Index" class="btn btn-outline-secondary rounded-3">Xem Tất Cả Phòng</a>
+        </div>
+    </form>
+</div>
+
+<!-- Rooms Table -->
+<div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr class="small text-muted text-uppercase">
+                    <th class="ps-4">Ảnh & Tên Phòng</th>
+                    <th>Thuộc Khách Sạn</th>
+                    <th>Loại Phòng</th>
+                    <th>Sức Chứa / Giường</th>
+                    <th>Giá / Đêm</th>
+                    <th>Số Lượng (Trống/Tổng)</th>
+                    <th>Trạng Thái</th>
+                    <th class="text-end pe-4">Thao Tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var room in Model)
+                {
+                    <tr>
+                        <td class="ps-4">
+                            <div class="d-flex align-items-center">
+                                <img src="@room.ImageUrl" class="rounded-3 me-3" style="width: 60px; height: 45px; object-fit: cover;" alt="@room.Name" />
+                                <div>
+                                    <strong class="text-dark d-block">@room.Name</strong>
+                                    <small class="text-muted">@room.AreaM2 m²</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="text-truncate d-inline-block fw-semibold text-dark" style="max-width: 180px;">@room.Hotel?.Name</span>
+                            <small class="d-block text-muted">@room.Hotel?.City</small>
+                        </td>
+                        <td>
+                            <span class="badge bg-primary bg-opacity-10 text-primary fw-bold">@room.RoomType?.Name</span>
+                        </td>
+                        <td>
+                            <div class="small">
+                                <span><i class="bi bi-people me-1"></i> @room.Capacity người</span>
+                                <br />
+                                <span class="text-muted"><i class="bi bi-lamp me-1"></i> @room.BedInfo</span>
+                            </div>
+                        </td>
+                        <td>
+                            <strong class="text-danger">@room.PricePerNight.ToString("N0") đ</strong>
+                        </td>
+                        <td>
+                            <span class="badge bg-success bg-opacity-10 text-success fw-bold px-3 py-2 rounded-pill">
+                                @room.AvailableQuantity / @room.TotalQuantity
+                            </span>
+                        </td>
+                        <td>
+                            @if (room.IsActive)
+                            {
+                                <span class="badge bg-success px-2 py-1 rounded-pill">Hoạt Động</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary px-2 py-1 rounded-pill">Tạm Dừng</span>
+                            }
+                        </td>
+                        <td class="text-end pe-4">
+                            <div class="d-flex justify-content-end gap-1">
+                                <a asp-action="Edit" asp-route-id="@room.Id" class="btn btn-outline-primary btn-sm rounded-pill px-3" title="Chỉnh sửa">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#deleteRoomModal_@room.Id" title="Xóa">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+
+                                <!-- Delete Modal -->
+                                <div class="modal fade" id="deleteRoomModal_@room.Id" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content border-0 rounded-4 shadow">
+                                            <div class="modal-header border-0 pb-0">
+                                                <h5 class="modal-title fw-bold text-danger"><i class="bi bi-exclamation-triangle-fill me-2"></i> Xác Nhận Xóa Phòng</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body text-start py-3">
+                                                Bạn có chắc chắn muốn xóa hạng phòng <strong>@room.Name</strong> thuộc khách sạn <strong>@room.Hotel?.Name</strong>?
+                                            </div>
+                                            <div class="modal-footer border-0 pt-0">
+                                                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Hủy</button>
+                                                <form asp-action="Delete" method="post">
+                                                    <input type="hidden" name="id" value="@room.Id" />
+                                                    <button type="submit" class="btn btn-danger rounded-pill px-4 fw-bold">Xác Nhận Xóa</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

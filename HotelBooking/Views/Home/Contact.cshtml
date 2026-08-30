@@ -1,0 +1,96 @@
+@{
+    ViewData["Title"] = "Liên Hệ - Hỗ Trợ 24/7";
+}
+
+<div class="container py-5 my-3">
+    <div class="text-center mb-5">
+        <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill fw-bold mb-2">LIÊN HỆ CHÚNG TÔI</span>
+        <h1 class="fw-extrabold text-dark display-5">Chúng Tôi Luôn Sẵn Sàng Lắng Nghe</h1>
+        <p class="text-muted lead">Đội ngũ hỗ trợ khách hàng phục vụ 24/7, luôn đồng hành cùng bạn trên mọi hành trình.</p>
+    </div>
+
+    <div class="row g-5">
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white h-100">
+                <h4 class="fw-bold text-dark mb-4">Thông Tin Liên Hệ</h4>
+
+                <div class="d-flex align-items-start mb-4">
+                    <div class="bg-primary bg-opacity-10 text-primary p-3 rounded-circle me-3">
+                        <i class="bi bi-geo-alt-fill fs-4"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-1">Trụ sở chính</h6>
+                        <p class="text-muted small mb-0">Tòa nhà Landmark 81, 720A Điện Biên Phủ, Phường 22, Quận Bình Thạnh, TP. Hồ Chí Minh</p>
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-start mb-4">
+                    <div class="bg-success bg-opacity-10 text-success p-3 rounded-circle me-3">
+                        <i class="bi bi-telephone-fill fs-4"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-1">Tổng đài đặt phòng</h6>
+                        <p class="text-muted small mb-0">1900 8888 (Miễn phí cước gọi)</p>
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-start mb-4">
+                    <div class="bg-warning bg-opacity-10 text-warning p-3 rounded-circle me-3">
+                        <i class="bi bi-envelope-fill fs-4 text-dark"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-1">Email hỗ trợ</h6>
+                        <p class="text-muted small mb-0">support@hotelbooking.vn / booking@luxuryhotel.vn</p>
+                    </div>
+                </div>
+
+                <div class="d-flex align-items-start">
+                    <div class="bg-danger bg-opacity-10 text-danger p-3 rounded-circle me-3">
+                        <i class="bi bi-clock-fill fs-4"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-1">Giờ làm việc</h6>
+                        <p class="text-muted small mb-0">24/7 Tất cả các ngày trong tuần (kể cả Lễ, Tết)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+                <h4 class="fw-bold text-dark mb-4">Gửi Lời Nhắn Cho Chúng Tôi</h4>
+                <form onsubmit="event.preventDefault(); alert('Cảm ơn bạn đã liên hệ! Chúng tôi sẽ phản hồi trong thời gian sớm nhất.'); this.reset();">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-muted">HỌ VÀ TÊN <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control bg-light rounded-3 py-2" placeholder="Nguyễn Văn A" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small text-muted">ĐỊA CHỈ EMAIL <span class="text-danger">*</span></label>
+                            <input type="email" class="form-control bg-light rounded-3 py-2" placeholder="email@example.com" required />
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold small text-muted">CHỦ ĐỀ CẦN HỖ TRỢ</label>
+                            <select class="form-select bg-light rounded-3 py-2">
+                                <option>Hỏi thông tin đặt phòng</option>
+                                <option>Yêu cầu hủy hoặc đổi ngày nhận phòng</option>
+                                <option>Hỗ trợ thanh toán / Hóa đơn</option>
+                                <option>Hợp tác kinh doanh khách sạn</option>
+                                <option>Góp ý chất lượng dịch vụ</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold small text-muted">NỘI DUNG CHI TIẾT <span class="text-danger">*</span></label>
+                            <textarea rows="4" class="form-control bg-light rounded-3 py-2" placeholder="Nhập thắc mắc hoặc yêu cầu của bạn tại đây..." required></textarea>
+                        </div>
+                        <div class="col-12 mt-4 text-end">
+                            <button type="submit" class="btn btn-primary px-5 py-2 rounded-3 fw-bold shadow-sm">
+                                <i class="bi bi-send-fill me-2"></i> Gửi Tin Nhắn
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

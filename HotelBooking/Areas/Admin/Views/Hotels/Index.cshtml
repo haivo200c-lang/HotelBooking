@@ -1,0 +1,145 @@
+@model List<HotelBooking.Models.Entities.Hotel>
+@{
+    ViewData["Title"] = "Quản Lý Khách Sạn";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="fw-bold text-dark mb-1">Danh Sách Khách Sạn & Resort</h4>
+        <p class="text-muted small mb-0">Quản lý các cơ sở lưu trú và dịch vụ trên toàn hệ thống</p>
+    </div>
+    <a asp-action="Create" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm">
+        <i class="bi bi-plus-lg me-1"></i> Thêm Khách Sạn Mới
+    </a>
+</div>
+
+<!-- Search & Filter Bar -->
+<div class="card border-0 shadow-sm rounded-4 p-3 bg-white mb-4">
+    <form method="get" class="row g-2 align-items-center">
+        <div class="col-md-6">
+            <div class="input-group">
+                <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted"></i></span>
+                <input type="text" name="search" class="form-control bg-light border-start-0" placeholder="Tìm theo tên khách sạn hoặc địa chỉ..." value="@ViewData["CurrentSearch"]" />
+            </div>
+        </div>
+        <div class="col-md-4">
+            <select name="city" class="form-select bg-light">
+                <option value="">-- Tất cả thành phố --</option>
+                @if (ViewData["Cities"] is List<string> cities)
+                {
+                    @foreach (var c in cities)
+                    {
+                        <option value="@c" selected="@(ViewData["CurrentCity"]?.ToString() == c)">@c</option>
+                    }
+                }
+            </select>
+        </div>
+        <div class="col-md-2 d-grid">
+            <button type="submit" class="btn btn-primary rounded-3 fw-semibold">Lọc</button>
+        </div>
+    </form>
+</div>
+
+<!-- Hotels Table -->
+<div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr class="small text-muted text-uppercase">
+                    <th class="ps-4">Ảnh & Khách Sạn</th>
+                    <th>Địa Điểm</th>
+                    <th>Hạng Sao</th>
+                    <th>Số Hạng Phòng</th>
+                    <th>Đánh Giá</th>
+                    <th>Trạng Thái</th>
+                    <th class="text-end pe-4">Thao Tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var hotel in Model)
+                {
+                    <tr>
+                        <td class="ps-4">
+                            <div class="d-flex align-items-center">
+                                <img src="@hotel.MainImageUrl" class="rounded-3 me-3" style="width: 70px; height: 50px; object-fit: cover;" alt="@hotel.Name" />
+                                <div>
+                                    <strong class="text-dark d-block">@hotel.Name</strong>
+                                    <small class="text-muted"><i class="bi bi-telephone me-1"></i> @hotel.Phone</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <strong class="text-dark d-block">@hotel.City</strong>
+                            <small class="text-muted text-truncate d-inline-block" style="max-width: 180px;">@hotel.Address</small>
+                        </td>
+                        <td>
+                            <span class="text-warning">
+                                @for (int i = 0; i < hotel.StarRating; i++)
+                                {
+                                    <i class="bi bi-star-fill"></i>
+                                }
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge bg-light text-primary border px-3 py-2 fw-bold">
+                                @hotel.Rooms.Count Hạng phòng
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge bg-primary px-2 py-1">@hotel.AverageRating</span>
+                            <small class="text-muted ms-1">(@hotel.Reviews.Count)</small>
+                        </td>
+                        <td>
+                            @if (hotel.IsActive)
+                            {
+                                <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-1 fw-bold">Đang Hoạt Động</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger bg-opacity-10 text-danger rounded-pill px-3 py-1 fw-bold">Tạm Ngưng</span>
+                            }
+                        </td>
+                        <td class="text-end pe-4">
+                            <div class="d-flex justify-content-end gap-1">
+                                <a asp-area="Admin" asp-controller="Rooms" asp-action="Index" asp-route-hotelId="@hotel.Id" class="btn btn-outline-info btn-sm rounded-pill px-2" title="Quản lý phòng">
+                                    <i class="bi bi-door-open"></i> Phòng
+                                </a>
+                                <a asp-action="Details" asp-route-id="@hotel.Id" class="btn btn-outline-secondary btn-sm rounded-pill px-2" title="Chi tiết">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a asp-action="Edit" asp-route-id="@hotel.Id" class="btn btn-outline-primary btn-sm rounded-pill px-2" title="Chỉnh sửa">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <button type="button" class="btn btn-outline-danger btn-sm rounded-pill px-2" data-bs-toggle="modal" data-bs-target="#deleteModal_@hotel.Id" title="Xóa">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+
+                                <!-- Modal Delete Confirmation -->
+                                <div class="modal fade" id="deleteModal_@hotel.Id" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content border-0 rounded-4 shadow">
+                                            <div class="modal-header border-0 pb-0">
+                                                <h5 class="modal-title fw-bold text-danger"><i class="bi bi-exclamation-triangle-fill me-2"></i> Xác Nhận Xóa Khách Sạn</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body text-start py-3">
+                                                Bạn có chắc chắn muốn xóa khách sạn <strong>@hotel.Name</strong> khỏi hệ thống?
+                                            </div>
+                                            <div class="modal-footer border-0 pt-0">
+                                                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Hủy</button>
+                                                <form asp-action="Delete" method="post">
+                                                    <input type="hidden" name="id" value="@hotel.Id" />
+                                                    <button type="submit" class="btn btn-danger rounded-pill px-4 fw-bold">Xác Nhận Xóa</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

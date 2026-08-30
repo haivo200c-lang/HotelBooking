@@ -1,0 +1,167 @@
+@model HotelBooking.Models.Entities.Booking
+@{
+    ViewData["Title"] = "Chi Tiết Đơn Đặt Phòng - " + Model.BookingCode;
+}
+
+<div class="container py-5 my-3">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4 d-print-none">
+        <ol class="breadcrumb small">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-decoration-none">Trang chủ</a></li>
+            <li class="breadcrumb-item"><a asp-action="History" class="text-decoration-none">Lịch sử đặt phòng</a></li>
+            <li class="breadcrumb-item active" aria-current="page">@Model.BookingCode</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden bg-white">
+                <!-- Header with Status Badge -->
+                <div class="p-4 bg-light border-bottom d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+                    <div>
+                        <span class="small text-muted text-uppercase d-block fw-bold">PHIẾU XÁC NHẬN ĐẶT PHÒNG</span>
+                        <h3 class="fw-extrabold text-primary font-monospace mb-0">@Model.BookingCode</h3>
+                    </div>
+                    <div class="mt-3 mt-md-0">
+                        @switch (Model.Status)
+                        {
+                            case "Confirmed":
+                                <span class="badge bg-success fs-6 px-3 py-2 rounded-pill"><i class="bi bi-check-circle me-1"></i> Đã Xác Nhận</span>
+                                break;
+                            case "Pending":
+                                <span class="badge bg-warning text-dark fs-6 px-3 py-2 rounded-pill"><i class="bi bi-hourglass-split me-1"></i> Chờ Duyệt</span>
+                                break;
+                            case "CheckedIn":
+                                <span class="badge bg-primary fs-6 px-3 py-2 rounded-pill"><i class="bi bi-door-open me-1"></i> Đang Lưu Trú</span>
+                                break;
+                            case "CheckedOut":
+                                <span class="badge bg-info text-dark fs-6 px-3 py-2 rounded-pill"><i class="bi bi-box-arrow-right me-1"></i> Đã Trả Phòng</span>
+                                break;
+                            case "Completed":
+                                <span class="badge bg-secondary fs-6 px-3 py-2 rounded-pill"><i class="bi bi-patch-check me-1"></i> Hoàn Tất</span>
+                                break;
+                            case "Cancelled":
+                                <span class="badge bg-danger fs-6 px-3 py-2 rounded-pill"><i class="bi bi-x-circle me-1"></i> Đã Hủy</span>
+                                break;
+                        }
+                    </div>
+                </div>
+
+                <div class="card-body p-4 p-md-5">
+                    <!-- Hotel and Customer grid -->
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-6">
+                            <h6 class="fw-bold text-dark text-uppercase small mb-2"><i class="bi bi-building text-primary me-1"></i> Khách Sạn</h6>
+                            <h5 class="fw-bold text-dark mb-1">@Model.Hotel?.Name</h5>
+                            <p class="text-muted small mb-1"><i class="bi bi-geo-alt me-1 text-danger"></i> @Model.Hotel?.Address, @Model.Hotel?.City</p>
+                            <p class="text-muted small mb-0"><i class="bi bi-telephone me-1 text-success"></i> @Model.Hotel?.Phone</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="fw-bold text-dark text-uppercase small mb-2"><i class="bi bi-person text-primary me-1"></i> Khách Hàng</h6>
+                            <p class="mb-1 text-dark"><strong>Họ tên:</strong> @Model.CustomerName</p>
+                            <p class="mb-1 text-muted small"><strong>Email:</strong> @Model.CustomerEmail</p>
+                            <p class="mb-0 text-muted small"><strong>SĐT:</strong> @Model.CustomerPhone</p>
+                        </div>
+                    </div>
+
+                    <!-- Stay schedule -->
+                    <div class="p-3 bg-light rounded-4 mb-4">
+                        <div class="row text-center g-2">
+                            <div class="col-sm-3 col-6 border-end">
+                                <span class="small text-muted d-block">Nhận phòng</span>
+                                <strong class="text-dark">@Model.CheckInDate.ToString("dd/MM/yyyy") (14:00)</strong>
+                            </div>
+                            <div class="col-sm-3 col-6 border-end">
+                                <span class="small text-muted d-block">Trả phòng</span>
+                                <strong class="text-dark">@Model.CheckOutDate.ToString("dd/MM/yyyy") (12:00)</strong>
+                            </div>
+                            <div class="col-sm-3 col-6 border-end">
+                                <span class="small text-muted d-block">Thời gian</span>
+                                <strong class="text-primary">@Model.TotalNights đêm</strong>
+                            </div>
+                            <div class="col-sm-3 col-6">
+                                <span class="small text-muted d-block">Số lượng</span>
+                                <strong class="text-dark">@Model.TotalRooms phòng, @Model.TotalGuests khách</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Room Details Table -->
+                    <h6 class="fw-bold text-dark text-uppercase small mb-2"><i class="bi bi-door-open text-primary me-1"></i> Hạng Phòng Đã Đặt</h6>
+                    <div class="table-responsive mb-4">
+                        <table class="table table-borderless table-striped align-middle rounded-3 overflow-hidden">
+                            <thead class="table-light">
+                                <tr class="small text-muted">
+                                    <th>Hạng Phòng</th>
+                                    <th class="text-center">Số Phòng</th>
+                                    <th class="text-center">Số Đêm</th>
+                                    <th class="text-end">Đơn Giá</th>
+                                    <th class="text-end">Thành Tiền</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var detail in Model.BookingDetails)
+                                {
+                                    <tr>
+                                        <td><strong>@detail.RoomName</strong></td>
+                                        <td class="text-center">@detail.Quantity</td>
+                                        <td class="text-center">@detail.Nights</td>
+                                        <td class="text-end">@detail.PricePerNight.ToString("N0") đ</td>
+                                        <td class="text-end fw-bold text-dark">@detail.SubTotal.ToString("N0") đ</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Payment summary -->
+                    <div class="row g-4 align-items-center mb-4">
+                        <div class="col-md-6">
+                            <div class="p-3 bg-light rounded-3">
+                                <span class="small text-muted d-block mb-1">Phương thức thanh toán:</span>
+                                @if (Model.Payment != null)
+                                {
+                                    <strong class="text-dark d-block mb-1">@Model.Payment.PaymentMethod</strong>
+                                    <small class="text-muted d-block">Mã GD: <span class="font-monospace">@Model.Payment.TransactionRef</span></small>
+                                    <small class="text-muted d-block">Thời gian: @(Model.Payment.PaidAt?.ToString("dd/MM/yyyy HH:mm") ?? "Chưa thanh toán")</small>
+                                }
+                                else
+                                {
+                                    <strong class="text-muted">Chưa có bản ghi thanh toán</strong>
+                                }
+                            </div>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <div class="d-flex justify-content-between text-muted small mb-1">
+                                <span>Tiền phòng:</span>
+                                <span>@Model.SubTotal.ToString("N0") đ</span>
+                            </div>
+                            <div class="d-flex justify-content-between text-muted small mb-1">
+                                <span>Thuế VAT (8%):</span>
+                                <span>@Model.TaxAmount.ToString("N0") đ</span>
+                            </div>
+                            <div class="d-flex justify-content-between text-muted small mb-2">
+                                <span>Phí dịch vụ (5%):</span>
+                                <span>@Model.ServiceFee.ToString("N0") đ</span>
+                            </div>
+                            <div class="d-flex justify-content-between fs-5 fw-bold text-dark pt-2 border-top">
+                                <span>Tổng cộng:</span>
+                                <span class="text-danger">@Model.TotalAmount.ToString("N0") đ</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action buttons -->
+                    <div class="d-flex justify-content-center gap-3 pt-4 border-top d-print-none">
+                        <button type="button" class="btn btn-outline-dark rounded-pill px-4 py-2 fw-semibold" onclick="window.print()">
+                            <i class="bi bi-printer me-1"></i> In Hóa Đơn
+                        </button>
+                        <a asp-action="History" class="btn btn-primary rounded-pill px-4 py-2 fw-bold">
+                            <i class="bi bi-arrow-left me-1"></i> Quay Lại Danh Sách
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

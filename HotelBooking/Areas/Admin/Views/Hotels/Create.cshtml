@@ -1,0 +1,113 @@
+@model HotelBooking.Models.Entities.Hotel
+@{
+    ViewData["Title"] = "Thêm Khách Sạn Mới";
+    var amenities = ViewBag.Amenities as List<HotelBooking.Models.Entities.Amenity> ?? new List<HotelBooking.Models.Entities.Amenity>();
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="fw-bold text-dark mb-1">Thêm Mới Khách Sạn</h4>
+        <p class="text-muted small mb-0">Điền thông tin chi tiết để thêm cơ sở lưu trú vào hệ thống</p>
+    </div>
+    <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4 fw-semibold">
+        <i class="bi bi-arrow-left me-1"></i> Quay Lại
+    </a>
+</div>
+
+<div class="card border-0 shadow-sm rounded-4 p-4 bg-white">
+    <form asp-action="Create" method="post">
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small"></div>
+
+        <div class="row g-3 mb-4">
+            <div class="col-md-8">
+                <label asp-for="Name" class="form-label fw-bold small text-muted">TÊN KHÁCH SẠN / RESORT <span class="text-danger">*</span></label>
+                <input asp-for="Name" class="form-control bg-light py-2 rounded-3" placeholder="Ví dụ: Vinpearl Luxury Landmark 81" required />
+                <span asp-validation-for="Name" class="text-danger small"></span>
+            </div>
+
+            <div class="col-md-4">
+                <label asp-for="StarRating" class="form-label fw-bold small text-muted">HẠNG SAO</label>
+                <select asp-for="StarRating" class="form-select bg-light py-2 rounded-3">
+                    <option value="5">⭐⭐⭐⭐⭐ (5 Sao)</option>
+                    <option value="4">⭐⭐⭐⭐ (4 Sao)</option>
+                    <option value="3">⭐⭐⭐ (3 Sao)</option>
+                </select>
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="Address" class="form-label fw-bold small text-muted">ĐỊA CHỈ ĐẦY ĐỦ <span class="text-danger">*</span></label>
+                <input asp-for="Address" class="form-control bg-light py-2 rounded-3" placeholder="Số nhà, tên đường, phường xã..." required />
+                <span asp-validation-for="Address" class="text-danger small"></span>
+            </div>
+
+            <div class="col-md-3">
+                <label asp-for="City" class="form-label fw-bold small text-muted">THÀNH PHỐ <span class="text-danger">*</span></label>
+                <input asp-for="City" class="form-control bg-light py-2 rounded-3" placeholder="Đà Nẵng, Phú Quốc..." required />
+                <span asp-validation-for="City" class="text-danger small"></span>
+            </div>
+
+            <div class="col-md-3">
+                <label asp-for="Country" class="form-label fw-bold small text-muted">QUỐC GIA</label>
+                <input asp-for="Country" class="form-control bg-light py-2 rounded-3" value="Việt Nam" required />
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="Phone" class="form-label fw-bold small text-muted">SỐ ĐIỆN THOẠI LIÊN HỆ</label>
+                <input asp-for="Phone" class="form-control bg-light py-2 rounded-3" placeholder="0236 393 8888" />
+            </div>
+
+            <div class="col-md-6">
+                <label asp-for="Email" class="form-label fw-bold small text-muted">EMAIL LIÊN HỆ</label>
+                <input asp-for="Email" type="email" class="form-control bg-light py-2 rounded-3" placeholder="contact@hotel.com" />
+            </div>
+
+            <div class="col-12">
+                <label asp-for="MainImageUrl" class="form-label fw-bold small text-muted">LINK HÌNH ẢNH ĐẠI DIỆN (URL) <span class="text-danger">*</span></label>
+                <input asp-for="MainImageUrl" class="form-control bg-light py-2 rounded-3" placeholder="https://images.unsplash.com/..." required />
+                <span asp-validation-for="MainImageUrl" class="text-danger small"></span>
+            </div>
+
+            <div class="col-12">
+                <label asp-for="Description" class="form-label fw-bold small text-muted">MÔ TẢ CHI TIẾT KHÁCH SẠN <span class="text-danger">*</span></label>
+                <textarea asp-for="Description" rows="4" class="form-control bg-light rounded-3" placeholder="Giới thiệu về vị trí, kiến trúc, điểm nổi bật..." required></textarea>
+                <span asp-validation-for="Description" class="text-danger small"></span>
+            </div>
+
+            <div class="col-md-6">
+                <div class="form-check form-switch mt-2">
+                    <input asp-for="IsFeatured" class="form-check-input" type="checkbox" id="isFeaturedCheck" />
+                    <label class="form-check-label fw-semibold" for="isFeaturedCheck">Đặt làm Khách Sạn Nổi Bật (Hiện trang chủ)</label>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="form-check form-switch mt-2">
+                    <input asp-for="IsActive" class="form-check-input" type="checkbox" id="isActiveCheck" checked />
+                    <label class="form-check-label fw-semibold" for="isActiveCheck">Đang Hoạt Động</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Amenities Selection -->
+        <h5 class="fw-bold text-dark mb-3"><i class="bi bi-grid text-primary me-2"></i> Chọn Tiện Nghi Cung Cấp</h5>
+        <div class="row g-3 mb-4">
+            @foreach (var amen in amenities)
+            {
+                <div class="col-md-3 col-sm-6">
+                    <div class="form-check p-2 bg-light rounded-3 border">
+                        <input class="form-check-input ms-1" type="checkbox" name="selectedAmenities" value="@amen.Id" id="amen_@amen.Id" />
+                        <label class="form-check-label small fw-semibold ms-2" for="amen_@amen.Id">
+                            <i class="bi @amen.Icon text-primary me-1"></i> @amen.Name
+                        </label>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="text-end pt-3 border-top">
+            <button type="submit" class="btn btn-primary px-5 py-2 rounded-pill fw-bold shadow-sm">
+                <i class="bi bi-check-circle me-1"></i> Lưu Khách Sạn Mới
+            </button>
+        </div>
+    </form>
+</div>

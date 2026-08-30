@@ -1,0 +1,237 @@
+@model HotelBooking.Models.ViewModels.CheckoutViewModel
+@{
+    ViewData["Title"] = "Xác Nhận & Đặt Phòng - " + Model.Hotel?.Name;
+}
+
+<div class="container py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb small">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-decoration-none">Trang chủ</a></li>
+            <li class="breadcrumb-item"><a asp-controller="Hotel" asp-action="Detail" asp-route-id="@Model.HotelId" class="text-decoration-none">@Model.Hotel?.Name</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Xác nhận đặt phòng</li>
+        </ol>
+    </nav>
+
+    <!-- Step Progress Bar -->
+    <div class="card border-0 shadow-sm rounded-4 p-3 mb-4 bg-white">
+        <div class="row text-center">
+            <div class="col-4">
+                <span class="badge bg-primary rounded-circle p-2 px-3 fw-bold me-1">1</span>
+                <span class="fw-bold text-primary small">Thông Tin Đặt Phòng</span>
+            </div>
+            <div class="col-4">
+                <span class="badge bg-secondary rounded-circle p-2 px-3 fw-bold me-1">2</span>
+                <span class="fw-semibold text-muted small">Thanh Toán Demo</span>
+            </div>
+            <div class="col-4">
+                <span class="badge bg-secondary rounded-circle p-2 px-3 fw-bold me-1">3</span>
+                <span class="fw-semibold text-muted small">Xác Nhận Thành Công</span>
+            </div>
+        </div>
+    </div>
+
+    <form asp-action="Checkout" method="post">
+        <input type="hidden" asp-for="HotelId" />
+        <input type="hidden" asp-for="RoomId" />
+        <input type="hidden" asp-for="UnitPrice" />
+
+        <div class="row g-4">
+            <!-- Left Form Column -->
+            <div class="col-lg-8">
+                <!-- Customer Contact Information -->
+                <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
+                    <h5 class="fw-bold text-dark mb-3"><i class="bi bi-person-lines-fill text-primary me-2"></i> 1. Thông Tin Khách Hàng</h5>
+                    
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small"></div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label asp-for="CustomerName" class="form-label fw-semibold small text-muted">HỌ VÀ TÊN <span class="text-danger">*</span></label>
+                            <input asp-for="CustomerName" class="form-control bg-light py-2 rounded-3" placeholder="Ví dụ: Nguyễn Văn An" required />
+                            <span asp-validation-for="CustomerName" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="CustomerEmail" class="form-label fw-semibold small text-muted">EMAIL NHẬN MÃ ĐẶT PHÒNG <span class="text-danger">*</span></label>
+                            <input asp-for="CustomerEmail" class="form-control bg-light py-2 rounded-3" placeholder="email@example.com" required />
+                            <span asp-validation-for="CustomerEmail" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="CustomerPhone" class="form-label fw-semibold small text-muted">SỐ ĐIỆN THOẠI LIÊN HỆ <span class="text-danger">*</span></label>
+                            <input asp-for="CustomerPhone" class="form-control bg-light py-2 rounded-3" placeholder="0912345678" required />
+                            <span asp-validation-for="CustomerPhone" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="CustomerAddress" class="form-label fw-semibold small text-muted">ĐỊA CHỈ THƯỜNG TRÚ</label>
+                            <input asp-for="CustomerAddress" class="form-control bg-light py-2 rounded-3" placeholder="Hà Nội, TP.HCM..." />
+                            <span asp-validation-for="CustomerAddress" class="text-danger small"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Booking Dates & Guests -->
+                <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
+                    <h5 class="fw-bold text-dark mb-3"><i class="bi bi-calendar2-range text-primary me-2"></i> 2. Thời Gian & Số Lượng Phòng</h5>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label asp-for="CheckInDate" class="form-label fw-semibold small text-muted">NGÀY NHẬN PHÒNG <span class="text-danger">*</span></label>
+                            <input asp-for="CheckInDate" type="date" class="form-control bg-light py-2 rounded-3 fw-semibold" required />
+                            <span asp-validation-for="CheckInDate" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="CheckOutDate" class="form-label fw-semibold small text-muted">NGÀY TRẢ PHÒNG <span class="text-danger">*</span></label>
+                            <input asp-for="CheckOutDate" type="date" class="form-control bg-light py-2 rounded-3 fw-semibold" required />
+                            <span asp-validation-for="CheckOutDate" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="TotalRooms" class="form-label fw-semibold small text-muted">SỐ LƯỢNG PHÒNG ĐẶT</label>
+                            <select asp-for="TotalRooms" class="form-select bg-light py-2 rounded-3 fw-semibold">
+                                @for (int i = 1; i <= Math.Min(5, Model.Room?.AvailableQuantity ?? 5); i++)
+                                {
+                                    <option value="@i">@i Phòng</option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="TotalGuests" class="form-label fw-semibold small text-muted">SỐ LƯỢNG KHÁCH LƯU TRÚ</label>
+                            <select asp-for="TotalGuests" class="form-select bg-light py-2 rounded-3 fw-semibold">
+                                <option value="1">1 Khách</option>
+                                <option value="2">2 Khách</option>
+                                <option value="3">3 Khách</option>
+                                <option value="4">4 Khách</option>
+                                <option value="6">6 Khách</option>
+                            </select>
+                        </div>
+
+                        <div class="col-12">
+                            <label asp-for="Notes" class="form-label fw-semibold small text-muted">YÊU CẦU ĐẶC BIỆT (TÙY CHỌN)</label>
+                            <textarea asp-for="Notes" rows="2" class="form-control bg-light rounded-3" placeholder="Ví dụ: Phòng tầng cao, phòng không hút thuốc, nhận phòng muộn..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Method Selection -->
+                <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
+                    <h5 class="fw-bold text-dark mb-3"><i class="bi bi-credit-card-2-front text-primary me-2"></i> 3. Chọn Phương Thức Thanh Toán (Demo)</h5>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="card p-3 rounded-4 border cursor-pointer h-100 d-flex flex-row align-items-center gap-3">
+                                <input type="radio" asp-for="PaymentMethod" value="VNPay" class="form-check-input mt-0" checked />
+                                <div class="bg-danger bg-opacity-10 text-danger p-2 rounded-3 fw-bold">VNPay</div>
+                                <div>
+                                    <h6 class="mb-0 fw-bold">Cổng VNPay (Mô Phỏng QR)</h6>
+                                    <small class="text-muted">Quét mã QR qua App ngân hàng</small>
+                                </div>
+                            </label>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="card p-3 rounded-4 border cursor-pointer h-100 d-flex flex-row align-items-center gap-3">
+                                <input type="radio" asp-for="PaymentMethod" value="MoMo" class="form-check-input mt-0" />
+                                <div class="bg-primary bg-opacity-10 text-primary p-2 rounded-3 fw-bold" style="color: #a50064 !important; background-color: #fce4ec !important;">MoMo</div>
+                                <div>
+                                    <h6 class="mb-0 fw-bold">Ví Điện Tử MoMo (Demo)</h6>
+                                    <small class="text-muted">Thanh toán tức thì qua MoMo</small>
+                                </div>
+                            </label>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="card p-3 rounded-4 border cursor-pointer h-100 d-flex flex-row align-items-center gap-3">
+                                <input type="radio" asp-for="PaymentMethod" value="BankTransfer" class="form-check-input mt-0" />
+                                <div class="bg-success bg-opacity-10 text-success p-2 rounded-3 fw-bold">VietQR</div>
+                                <div>
+                                    <h6 class="mb-0 fw-bold">Chuyển Khoản Ngân Hàng</h6>
+                                    <small class="text-muted">Chuyển khoản 24/7 qua Napas</small>
+                                </div>
+                            </label>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="card p-3 rounded-4 border cursor-pointer h-100 d-flex flex-row align-items-center gap-3">
+                                <input type="radio" asp-for="PaymentMethod" value="Cash" class="form-check-input mt-0" />
+                                <div class="bg-secondary bg-opacity-10 text-secondary p-2 rounded-3 fw-bold">Tiền Mặt</div>
+                                <div>
+                                    <h6 class="mb-0 fw-bold">Thanh Toán Tại Khách Sạn</h6>
+                                    <small class="text-muted">Thanh toán khi nhận phòng</small>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Price Summary Column -->
+            <div class="col-lg-4">
+                <div class="sticky-booking-widget">
+                    <h5 class="fw-bold text-dark mb-3">Tóm Tắt Đơn Đặt Phòng</h5>
+
+                    <div class="d-flex align-items-center mb-3">
+                        <img src="@Model.Room?.ImageUrl" class="rounded-3 me-3" style="width: 80px; height: 60px; object-fit: cover;" alt="@Model.Room?.Name" />
+                        <div>
+                            <h6 class="fw-bold text-dark mb-0 text-truncate" style="max-width: 180px;">@Model.Room?.Name</h6>
+                            <small class="text-muted"><i class="bi bi-building me-1"></i> @Model.Hotel?.Name</small>
+                        </div>
+                    </div>
+
+                    <div class="p-3 bg-light rounded-3 mb-3 small">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="text-muted">Nhận phòng:</span>
+                            <strong class="text-dark">@Model.CheckInDate.ToString("dd/MM/yyyy") (14:00)</strong>
+                        </div>
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="text-muted">Trả phòng:</span>
+                            <strong class="text-dark">@Model.CheckOutDate.ToString("dd/MM/yyyy") (12:00)</strong>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted">Thời gian:</span>
+                            <strong class="text-primary">@Model.TotalNights đêm, @Model.TotalRooms phòng</strong>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between small text-muted mb-2">
+                            <span>Giá phòng (@Model.TotalNights đêm x @Model.TotalRooms phòng):</span>
+                            <span class="fw-bold text-dark">@Model.SubTotal.ToString("N0") đ</span>
+                        </div>
+                        <div class="d-flex justify-content-between small text-muted mb-2">
+                            <span>Thuế GTGT VAT (8%):</span>
+                            <span class="text-dark">@Model.TaxAmount.ToString("N0") đ</span>
+                        </div>
+                        <div class="d-flex justify-content-between small text-muted mb-3">
+                            <span>Phí dịch vụ khách sạn (5%):</span>
+                            <span class="text-dark">@Model.ServiceFee.ToString("N0") đ</span>
+                        </div>
+                        <hr class="my-2" />
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h6 class="fw-bold mb-0 text-dark">Tổng Thanh Toán:</h6>
+                            <span class="fs-4 fw-extrabold text-danger">@Model.TotalAmount.ToString("N0") đ</span>
+                        </div>
+                    </div>
+
+                    <div class="d-grid mb-3">
+                        <button type="submit" class="btn btn-primary btn-lg rounded-pill fw-bold py-3 shadow-sm d-flex align-items-center justify-content-center gap-2" style="background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%); border: none;">
+                            <i class="bi bi-shield-lock-fill"></i> Xác Nhận & Đặt Phòng
+                        </button>
+                    </div>
+
+                    <div class="small text-muted text-center">
+                        <i class="bi bi-check2-circle text-success me-1"></i> Không trừ tiền thật - Hệ thống Demo
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
